@@ -1,4 +1,5 @@
 # 🎬 RELATÓRIO COMPLETO DE AUDITORIA QA - NETFLIX CLONE
+
 **Data:** 31 de Março de 2026  
 **Status:** ✅ ANÁLISE CONCLUÍDA  
 **Revisor:** Engenheiro de QA
@@ -7,15 +8,15 @@
 
 ## 📋 ÍNDICE EXECUTIVO
 
-| Aspecto | Status | Detalhes |
-|---------|--------|----------|
-| **Backend - Arquitetura** | ✅ Clean Architecture | Domain, Application, Infrastructure, Interfaces |
-| **Backend - Funcionalidades** | ✅ 9 Use Cases | Auth, Profiles, Watchlist, Trending |
-| **Backend - Endpoints** | ✅ 9 Rotas API | 3 Controllers, 3 Repositories |
-| **Frontend - Páginas** | ✅ 6 Páginas | Login, Register, Home, Dashboard, Trending |
-| **Frontend - Estado** | ✅ Context API | Auth Context, API Client |
-| **Dados** | ✅ PostgreSQL + Redis | 4 Models, Cache distribuído |
-| **Segurança** | ✅ JWT + BCrypt | Rate Limiting, CORS, Helmet |
+| Aspecto                       | Status                | Detalhes                                        |
+| ----------------------------- | --------------------- | ----------------------------------------------- |
+| **Backend - Arquitetura**     | ✅ Clean Architecture | Domain, Application, Infrastructure, Interfaces |
+| **Backend - Funcionalidades** | ✅ 9 Use Cases        | Auth, Profiles, Watchlist, Trending             |
+| **Backend - Endpoints**       | ✅ 9 Rotas API        | 3 Controllers, 3 Repositories                   |
+| **Frontend - Páginas**        | ✅ 6 Páginas          | Login, Register, Home, Dashboard, Trending      |
+| **Frontend - Estado**         | ✅ Context API        | Auth Context, API Client                        |
+| **Dados**                     | ✅ PostgreSQL + Redis | 4 Models, Cache distribuído                     |
+| **Segurança**                 | ✅ JWT + BCrypt       | Rate Limiting, CORS, Helmet                     |
 
 ---
 
@@ -113,16 +114,16 @@ src/
 
 ### 1.2. CONTAGEM DE COMPONENTES BACKEND
 
-| Componente | Quantidade | Status |
-|-----------|-----------|---------|
-| **Entidades de Domínio** | 3 | ✅ User, Profile, WatchlistItem |
-| **Interfaces de Repositório** | 3 | ✅ User, Profile, Watchlist |
-| **Use Cases / Casos de Uso** | 9 | ✅ Auth, Profile, Watchlist, Trending |
-| **Controllers** | 3 | ✅ Auth, Profile, Watchlist |
-| **Repositories (Prisma)** | 3 | ✅ Prisma implementation |
-| **Middlewares** | 2 | ✅ Auth, Error Handler |
-| **Serviços de Aplicação** | 2 | ✅ Password, Token |
-| **Serviços de Infraestrutura** | 2 | ✅ Redis Cache, TMDB Client |
+| Componente                     | Quantidade | Status                                |
+| ------------------------------ | ---------- | ------------------------------------- |
+| **Entidades de Domínio**       | 3          | ✅ User, Profile, WatchlistItem       |
+| **Interfaces de Repositório**  | 3          | ✅ User, Profile, Watchlist           |
+| **Use Cases / Casos de Uso**   | 9          | ✅ Auth, Profile, Watchlist, Trending |
+| **Controllers**                | 3          | ✅ Auth, Profile, Watchlist           |
+| **Repositories (Prisma)**      | 3          | ✅ Prisma implementation              |
+| **Middlewares**                | 2          | ✅ Auth, Error Handler                |
+| **Serviços de Aplicação**      | 2          | ✅ Password, Token                    |
+| **Serviços de Infraestrutura** | 2          | ✅ Redis Cache, TMDB Client           |
 
 **TOTAL: 27 componentes principais**
 
@@ -132,31 +133,31 @@ src/
 
 #### **AUTH (Autenticação - 3 Use Cases)**
 
-| Use Case | Responsabilidade | Entrada | Saída |
-|----------|-----------------|---------|-------|
-| **RegisterUser** | Registrar novo usuário | email, password | id, email |
-| **Login** | Autenticar usuário | email, password | accessToken, refreshToken |
-| **RefreshToken** | Renovar access token | refreshToken | novo accessToken |
+| Use Case         | Responsabilidade       | Entrada         | Saída                     |
+| ---------------- | ---------------------- | --------------- | ------------------------- |
+| **RegisterUser** | Registrar novo usuário | email, password | id, email                 |
+| **Login**        | Autenticar usuário     | email, password | accessToken, refreshToken |
+| **RefreshToken** | Renovar access token   | refreshToken    | novo accessToken          |
 
 #### **PROFILES (Perfis - 2 Use Cases)**
 
-| Use Case | Responsabilidade | Entrada | Saída |
-|----------|-----------------|---------|-------|
-| **CreateProfile** | Criar novo perfil | userId, name, avatarUrl | id, userId, name |
-| **GetProfiles** | Listar perfis do usuário | userId | Lista de Profiles |
+| Use Case          | Responsabilidade         | Entrada                 | Saída             |
+| ----------------- | ------------------------ | ----------------------- | ----------------- |
+| **CreateProfile** | Criar novo perfil        | userId, name, avatarUrl | id, userId, name  |
+| **GetProfiles**   | Listar perfis do usuário | userId                  | Lista de Profiles |
 
 #### **WATCHLIST (Lista de Desejos - 3 Use Cases)**
 
-| Use Case | Responsabilidade | Entrada | Saída |
-|----------|-----------------|---------|-------|
-| **AddToWatchlist** | Adicionar filme/série | profileId, tmdbId, mediaType | WatchlistItem criado |
-| **RemoveFromWatchlist** | Remover da lista | profileId, watchlistItemId | Confirmação |
-| **GetWatchlistItems** | Listar watchlist | profileId | Lista de WatchlistItems |
+| Use Case                | Responsabilidade      | Entrada                      | Saída                   |
+| ----------------------- | --------------------- | ---------------------------- | ----------------------- |
+| **AddToWatchlist**      | Adicionar filme/série | profileId, tmdbId, mediaType | WatchlistItem criado    |
+| **RemoveFromWatchlist** | Remover da lista      | profileId, watchlistItemId   | Confirmação             |
+| **GetWatchlistItems**   | Listar watchlist      | profileId                    | Lista de WatchlistItems |
 
 #### **TRENDING (Tendências - 1 Use Case)**
 
-| Use Case | Responsabilidade | Entrada | Saída |
-|----------|-----------------|---------|-------|
+| Use Case              | Responsabilidade       | Entrada             | Saída                      |
+| --------------------- | ---------------------- | ------------------- | -------------------------- |
 | **GetTrendingMovies** | Buscar tendências TMDB | mediaType, language | Filmes/Séries em tendência |
 
 ---
@@ -239,6 +240,7 @@ GET    /api/trending
 ```
 
 **RESUMO: 9 endpoints totais**
+
 - ✅ 2 públicos (POST /register, POST /login)
 - ✅ 7 protegidos (requerem JWT)
 - ✅ Rate limiting: 100 req/min por IP
@@ -256,10 +258,10 @@ model User {
   passwordHash      String
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  
+
   profiles          Profile[]
   refreshTokens     RefreshToken[]
-  
+
   @@index([email])
 }
 
@@ -271,10 +273,10 @@ model Profile {
   isKids            Boolean     @default(false)
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  
+
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   watchlistItems    WatchlistItem[]
-  
+
   @@unique([userId, name])
   @@index([userId])
 }
@@ -287,9 +289,9 @@ model WatchlistItem {
   title             String
   posterPath        String?
   addedAt           DateTime    @default(now())
-  
+
   profile           Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  
+
   @@unique([profileId, tmdbId, mediaType])
   @@index([profileId])
   @@index([tmdbId])
@@ -302,15 +304,16 @@ model RefreshToken {
   expiresAt         DateTime
   createdAt         DateTime    @default(now())
   revokedAt         DateTime?
-  
+
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([expiresAt])
 }
 ```
 
 **Índices Implementados:**
+
 - ✅ User(email) - para busca por email
 - ✅ Profile(userId) - para listar perfis do usuário
 - ✅ WatchlistItem(profileId, tmdbId) - para filtros combinados
@@ -322,23 +325,23 @@ model RefreshToken {
 
 #### **Autenticação**
 
-| Aspecto | Implementação | Status |
-|---------|--------------|--------|
-| **Hashing de Senha** | BCrypt 12 rounds | ✅ Seguro |
+| Aspecto                | Implementação                                 | Status          |
+| ---------------------- | --------------------------------------------- | --------------- |
+| **Hashing de Senha**   | BCrypt 12 rounds                              | ✅ Seguro       |
 | **Validação de Senha** | Força mínima 8 chars + 1 uppercase + 1 número | ✅ Implementado |
-| **JWT Access Token** | TTL: 15 minutos | ✅ Configurado |
-| **JWT Refresh Token** | TTL: 7 dias | ✅ Configurado |
-| **Token Refresh** | Endpoint /auth/refresh protegido | ✅ Implementado |
+| **JWT Access Token**   | TTL: 15 minutos                               | ✅ Configurado  |
+| **JWT Refresh Token**  | TTL: 7 dias                                   | ✅ Configurado  |
+| **Token Refresh**      | Endpoint /auth/refresh protegido              | ✅ Implementado |
 
 #### **Proteção de API**
 
-| Aspecto | Implementação | Status |
-|---------|--------------|--------|
-| **CORS** | Origem: process.env.FRONTEND_URL | ✅ Configurado |
-| **Helmet** | Headers de segurança HTTP | ✅ Ativado |
-| **Rate Limiting** | 100 req/min por IP | ✅ Implementado |
-| **JWT Middleware** | Validação em rotas protegidas | ✅ Implementado |
-| **Sanitização** | Validação com Zod | ✅ Disponível |
+| Aspecto            | Implementação                    | Status          |
+| ------------------ | -------------------------------- | --------------- |
+| **CORS**           | Origem: process.env.FRONTEND_URL | ✅ Configurado  |
+| **Helmet**         | Headers de segurança HTTP        | ✅ Ativado      |
+| **Rate Limiting**  | 100 req/min por IP               | ✅ Implementado |
+| **JWT Middleware** | Validação em rotas protegidas    | ✅ Implementado |
+| **Sanitização**    | Validação com Zod                | ✅ Disponível   |
 
 #### **Validações**
 
@@ -413,7 +416,7 @@ model RefreshToken {
     "lib": ["ES2020"],
     "outDir": "./dist",
     "rootDir": "./src",
-    
+
     // Strict mode
     "strict": true,
     "noImplicitAny": true,
@@ -423,7 +426,7 @@ model RefreshToken {
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    
+
     // Path mapping
     "baseUrl": ".",
     "paths": {
@@ -441,7 +444,7 @@ model RefreshToken {
   testEnvironment: "node",
   testMatch: ["**/?(*.)+(spec|test).ts"],
   collectCoverageFrom: ["src/**/*.ts"],
-  
+
   // Coverage threshold (obrigatório)
   coverageThreshold: {
     global: {
@@ -457,15 +460,12 @@ model RefreshToken {
 #### **docker-compose.yml**
 
 ```yaml
-Services:
-  ✅ postgres:15-alpine       (porta 5432)
+Services: ✅ postgres:15-alpine       (porta 5432)
   ✅ redis:7-alpine           (porta 6379)
-  
-Network:
-  ✅ netflix-network (comunicação intra-container)
-  
-Volumes:
-  ✅ postgres_data
+
+Network: ✅ netflix-network (comunicação intra-container)
+
+Volumes: ✅ postgres_data
   ✅ redis_data
 ```
 
@@ -513,26 +513,26 @@ LOG_LEVEL=debug
 
 ### 1.10. SCRIPTS NPM - BACKEND
 
-| Script | Comando | Propósito |
-|--------|---------|----------|
-| `npm run dev` | tsx watch src/index.ts | Desenvolvimento com hot-reload |
-| `npm run build` | tsc | Compilar TypeScript para JavaScript |
-| `npm start` | node dist/index.js | Produção |
-| `npm test` | jest --coverage | Testes com cobertura |
-| `npm run test:watch` | jest --watch | Testes em modo watch |
-| `npm run test:unit` | jest tests/unit --coverage | Apenas testes unitários |
-| `npm run test:integration` | jest tests/integration | Testes de integração |
-| `npm run test:e2e` | jest tests/e2e | Testes end-to-end |
-| `npm run test:security` | jest tests/security | Testes de segurança |
-| `npm run lint` | eslint src tests | Linting |
-| `npm run format` | prettier --write src tests | Formatação de código |
-| `npm run typecheck` | tsc --noEmit | Verificação de tipos |
-| `npm run prisma:migrate` | prisma migrate dev | Criar/aplicar migrations |
-| `npm run prisma:reset` | prisma migrate reset | Resetar DB |
-| `npm run prisma:studio` | prisma studio | GUI do banco de dados |
-| `npm run prisma:generate` | prisma generate | Gerar Prisma Client |
-| `npm run docker:up` | docker-compose up -d | Iniciar containers |
-| `npm run docker:down` | docker-compose down | Parar containers |
+| Script                     | Comando                    | Propósito                           |
+| -------------------------- | -------------------------- | ----------------------------------- |
+| `npm run dev`              | tsx watch src/index.ts     | Desenvolvimento com hot-reload      |
+| `npm run build`            | tsc                        | Compilar TypeScript para JavaScript |
+| `npm start`                | node dist/index.js         | Produção                            |
+| `npm test`                 | jest --coverage            | Testes com cobertura                |
+| `npm run test:watch`       | jest --watch               | Testes em modo watch                |
+| `npm run test:unit`        | jest tests/unit --coverage | Apenas testes unitários             |
+| `npm run test:integration` | jest tests/integration     | Testes de integração                |
+| `npm run test:e2e`         | jest tests/e2e             | Testes end-to-end                   |
+| `npm run test:security`    | jest tests/security        | Testes de segurança                 |
+| `npm run lint`             | eslint src tests           | Linting                             |
+| `npm run format`           | prettier --write src tests | Formatação de código                |
+| `npm run typecheck`        | tsc --noEmit               | Verificação de tipos                |
+| `npm run prisma:migrate`   | prisma migrate dev         | Criar/aplicar migrations            |
+| `npm run prisma:reset`     | prisma migrate reset       | Resetar DB                          |
+| `npm run prisma:studio`    | prisma studio              | GUI do banco de dados               |
+| `npm run prisma:generate`  | prisma generate            | Gerar Prisma Client                 |
+| `npm run docker:up`        | docker-compose up -d       | Iniciar containers                  |
+| `npm run docker:down`      | docker-compose down        | Parar containers                    |
 
 **Total: 18 scripts principais**
 
@@ -542,21 +542,21 @@ LOG_LEVEL=debug
 
 #### **Produção (13 dependências principais)**
 
-| Pacote | Versão | Propósito |
-|--------|--------|----------|
-| @prisma/client | ^5.8.0 | ORM para banco de dados |
-| express | ^4.18.2 | Framework web |
-| typescript | ^5.3.3 | Linguagem com tipagem |
-| jsonwebtoken | ^9.0.2 | Autenticação JWT |
-| bcryptjs | ^2.4.3 | Hash de senhas |
-| redis | ^4.6.13 | Cache distribuído |
-| axios | ^1.6.2 | Cliente HTTP (TMDB) |
-| cors | ^2.8.5 | CORS middleware |
-| helmet | ^7.1.0 | Segurança HTTP headers |
-| express-rate-limit | ^7.0.0 | Rate limiting |
-| dotenv | ^16.3.1 | Variáveis de ambiente |
-| uuid | ^9.0.1 | Geração de UUIDs |
-| zod | ^3.22.4 | Validação de schemas |
+| Pacote             | Versão  | Propósito               |
+| ------------------ | ------- | ----------------------- |
+| @prisma/client     | ^5.8.0  | ORM para banco de dados |
+| express            | ^4.18.2 | Framework web           |
+| typescript         | ^5.3.3  | Linguagem com tipagem   |
+| jsonwebtoken       | ^9.0.2  | Autenticação JWT        |
+| bcryptjs           | ^2.4.3  | Hash de senhas          |
+| redis              | ^4.6.13 | Cache distribuído       |
+| axios              | ^1.6.2  | Cliente HTTP (TMDB)     |
+| cors               | ^2.8.5  | CORS middleware         |
+| helmet             | ^7.1.0  | Segurança HTTP headers  |
+| express-rate-limit | ^7.0.0  | Rate limiting           |
+| dotenv             | ^16.3.1 | Variáveis de ambiente   |
+| uuid               | ^9.0.1  | Geração de UUIDs        |
+| zod                | ^3.22.4 | Validação de schemas    |
 
 #### **Desenvolvimento (16 dependências dev)**
 
@@ -599,14 +599,14 @@ frontend/app
 
 **Total de Páginas: 6**
 
-| Página | Rota | Função |
-|--------|------|--------|
-| **Home** | / | Landing page inicial |
-| **Login** | /auth/login | Formulário de login |
-| **Register** | /auth/register | Formulário de registro |
-| **Dashboard** | /dashboard | Página principal autenticada |
-| **Trending** | /trending | Filmes em tendência |
-| **layout** | (global) | Configuração de layout |
+| Página        | Rota           | Função                       |
+| ------------- | -------------- | ---------------------------- |
+| **Home**      | /              | Landing page inicial         |
+| **Login**     | /auth/login    | Formulário de login          |
+| **Register**  | /auth/register | Formulário de registro       |
+| **Dashboard** | /dashboard     | Página principal autenticada |
+| **Trending**  | /trending      | Filmes em tendência          |
+| **layout**    | (global)       | Configuração de layout       |
 
 ---
 
@@ -761,10 +761,10 @@ frontend/tests/
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "jsx": "preserve",           // Para Next.js
+    "jsx": "preserve", // Para Next.js
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]             // Import aliases
+      "@/*": ["./*"] // Import aliases
     }
   }
 }
@@ -775,20 +775,20 @@ frontend/tests/
 ```javascript
 module.exports = {
   reactStrictMode: true,
-  
+
   // Image optimization para TMDB
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "image.tmdb.org"
+        hostname: "image.tmdb.org",
       },
       {
         protocol: "https",
-        hostname: "**.tmdb.org"
-      }
-    ]
-  }
+        hostname: "**.tmdb.org",
+      },
+    ],
+  },
 };
 ```
 
@@ -813,22 +813,22 @@ NEXT_PUBLIC_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p/w500
 
 #### **Produção (14 dependências)**
 
-| Pacote | Versão | Propósito |
-|--------|--------|----------|
-| next | ^14.1.4 | Framework React |
-| react | ^18.2.0 | Biblioteca UI |
-| react-dom | ^18.2.0 | Renderização DOM |
-| @tanstack/react-query | ^5.37.1 | Server state |
-| zustand | ^4.4.5 | State management |
-| axios | ^1.6.7 | Cliente HTTP |
-| tailwindcss | ^3.4.1 | CSS utility-first |
-| react-hook-form | ^7.50.1 | Gerenciamento de forms |
-| react-hot-toast | ^2.4.1 | Notificações toast |
-| lucide-react | ^0.378.0 | Ícones |
-| date-fns | ^3.3.1 | Manipulação de datas |
-| @hookform/resolvers | ^3.3.4 | Resolvers form validation |
-| typescript | ^5.3.3 | Tipagem |
-| @types/* | ^18+ | Tipos TypeScript |
+| Pacote                | Versão   | Propósito                 |
+| --------------------- | -------- | ------------------------- |
+| next                  | ^14.1.4  | Framework React           |
+| react                 | ^18.2.0  | Biblioteca UI             |
+| react-dom             | ^18.2.0  | Renderização DOM          |
+| @tanstack/react-query | ^5.37.1  | Server state              |
+| zustand               | ^4.4.5   | State management          |
+| axios                 | ^1.6.7   | Cliente HTTP              |
+| tailwindcss           | ^3.4.1   | CSS utility-first         |
+| react-hook-form       | ^7.50.1  | Gerenciamento de forms    |
+| react-hot-toast       | ^2.4.1   | Notificações toast        |
+| lucide-react          | ^0.378.0 | Ícones                    |
+| date-fns              | ^3.3.1   | Manipulação de datas      |
+| @hookform/resolvers   | ^3.3.4   | Resolvers form validation |
+| typescript            | ^5.3.3   | Tipagem                   |
+| @types/\*             | ^18+     | Tipos TypeScript          |
 
 #### **Desenvolvimento (7 dependências dev)**
 
@@ -845,14 +845,14 @@ postcss
 
 ### 2.11. SCRIPTS NPM - FRONTEND
 
-| Script | Comando | Propósito |
-|--------|---------|----------|
-| `npm run dev` | next dev | Desenvolvimento (porta 3000) |
-| `npm run build` | next build | Build otimizado |
-| `npm start` | next start | Produção |
-| `npm run lint` | next lint | Linting |
-| `npm test` | jest | Testes |
-| `npm run test:watch` | jest --watch | Testes em watch mode |
+| Script               | Comando      | Propósito                    |
+| -------------------- | ------------ | ---------------------------- |
+| `npm run dev`        | next dev     | Desenvolvimento (porta 3000) |
+| `npm run build`      | next build   | Build otimizado              |
+| `npm start`          | next start   | Produção                     |
+| `npm run lint`       | next lint    | Linting                      |
+| `npm test`           | jest         | Testes                       |
+| `npm run test:watch` | jest --watch | Testes em watch mode         |
 
 ---
 
@@ -944,15 +944,15 @@ Threshold: 70% cobertura (branches, functions, lines, statements)
 
 ### 3.5. DETECÇÃO DE CONFORMIDADE
 
-| Aspecto | Backend | Frontend | Status |
-|---------|---------|----------|--------|
-| TypeScript | Strict ✅ | Strict ✅ | ✅ OK |
-| ESLint | Configured ✅ | Configured ✅ | ✅ OK |
-| Prettier | Configured ✅ | Configured ✅ | ✅ OK |
-| Testes | Jest ✅ | Jest ✅ | ✅ OK |
-| CI/CD | Docker ✅ | N/A | ✅ OK |
-| Logs | Debug mode | N/A | ✅ OK |
-| Error Handling | Global ✅ | Context ✅ | ✅ OK |
+| Aspecto        | Backend       | Frontend      | Status |
+| -------------- | ------------- | ------------- | ------ |
+| TypeScript     | Strict ✅     | Strict ✅     | ✅ OK  |
+| ESLint         | Configured ✅ | Configured ✅ | ✅ OK  |
+| Prettier       | Configured ✅ | Configured ✅ | ✅ OK  |
+| Testes         | Jest ✅       | Jest ✅       | ✅ OK  |
+| CI/CD          | Docker ✅     | N/A           | ✅ OK  |
+| Logs           | Debug mode    | N/A           | ✅ OK  |
+| Error Handling | Global ✅     | Context ✅    | ✅ OK  |
 
 ---
 
@@ -973,22 +973,22 @@ Threshold: 70% cobertura (branches, functions, lines, statements)
 
 ### 4.2. ÁREAS DE MELHORIA 🔴
 
-| Prioridade | Área | Ação |
-|-----------|------|------|
-| 🔴 ALTA | Componentes Frontend | Implementar componentes em src/components/* |
-| 🔴 ALTA | Serviços Frontend | Implementar services/api calls |
-| 🟡 MÉDIA | Hooks Frontend | Criar hooks customizados (useAuth, useFetch) |
-| 🟡 MÉDIA | Store Frontend | Implementar Zustand stores |
-| 🟡 MÉDIA | Testes | Aumentar cobertura acima de 70% |
-| 🟢 BAIXA | Documentação | Adicionar JSDoc em métodos públicos |
-| 🟢 BAIXA | Logging | Implementar Winston/Pino para logging estruturado |
+| Prioridade | Área                 | Ação                                              |
+| ---------- | -------------------- | ------------------------------------------------- |
+| 🔴 ALTA    | Componentes Frontend | Implementar componentes em src/components/\*      |
+| 🔴 ALTA    | Serviços Frontend    | Implementar services/api calls                    |
+| 🟡 MÉDIA   | Hooks Frontend       | Criar hooks customizados (useAuth, useFetch)      |
+| 🟡 MÉDIA   | Store Frontend       | Implementar Zustand stores                        |
+| 🟡 MÉDIA   | Testes               | Aumentar cobertura acima de 70%                   |
+| 🟢 BAIXA   | Documentação         | Adicionar JSDoc em métodos públicos               |
+| 🟢 BAIXA   | Logging              | Implementar Winston/Pino para logging estruturado |
 
 ---
 
 ### 4.3. RECOMENDAÇÕES DE SEGURANÇA
 
 ```
-[RECOMENDADO] 
+[RECOMENDADO]
 1. Implementar HTTPS em produção
 2. Adicionar HTTPS-only cookie para refresh token
 3. Implementar CSRF protection
@@ -1019,15 +1019,15 @@ Threshold: 70% cobertura (branches, functions, lines, statements)
 
 ### 5.1. MÉTRICAS GERAIS
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| **Linhas de Código** | ~2,500+ | ✅ Moderado |
-| **Componentes Principais** | 27 | ✅ Bem organizado |
-| **Endpoints API** | 9 | ✅ Responsabilidade clara |
-| **Modelos DB** | 4 | ✅ Normalized |
-| **Cobertura de Testes** | 70% (target) | ✅ Threshold |
-| **Segurança** | Forte | ✅ BCrypt + JWT + Rate Limit |
-| **Documentação** | Parcial | 🟡 Precisa de melhorias |
+| Métrica                    | Valor        | Status                       |
+| -------------------------- | ------------ | ---------------------------- |
+| **Linhas de Código**       | ~2,500+      | ✅ Moderado                  |
+| **Componentes Principais** | 27           | ✅ Bem organizado            |
+| **Endpoints API**          | 9            | ✅ Responsabilidade clara    |
+| **Modelos DB**             | 4            | ✅ Normalized                |
+| **Cobertura de Testes**    | 70% (target) | ✅ Threshold                 |
+| **Segurança**              | Forte        | ✅ BCrypt + JWT + Rate Limit |
+| **Documentação**           | Parcial      | 🟡 Precisa de melhorias      |
 
 ---
 
@@ -1063,7 +1063,7 @@ O projeto **Netflix Clone** apresenta:
 ✅ **Segurança robusta**: Autenticação e autorização corretas  
 ✅ **Código de qualidade**: TypeScript strict mode, ESLint, testes  
 ✅ **Escalabilidade**: RabbitMQ-ready, Cache Redis, DB normalizadoI  
-✅ **Pronto para produção**: Docker, configuração environment, CI/CD ready  
+✅ **Pronto para produção**: Docker, configuração environment, CI/CD ready
 
 **RECOMENDAÇÃO FINAL**: ✅ **APROVADO PARA DEPLOY**
 
@@ -1094,5 +1094,5 @@ Veja arquivo: `backend/SETUP.md` e `frontend/FRONTEND_SETUP.md`
 ---
 
 **Fim do Relatório de Auditoria QA**  
-*Gerado em 31 de Março de 2026*  
-*Auditado por: Engenheiro de QA*
+_Gerado em 31 de Março de 2026_  
+_Auditado por: Engenheiro de QA_

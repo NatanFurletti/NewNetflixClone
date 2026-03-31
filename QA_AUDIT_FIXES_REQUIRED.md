@@ -9,26 +9,31 @@
 ## ✅ CORREÇÕES JÁ FEITAS
 
 ### 1. Token Format Inconsistency ✅
+
 - **Arquivo:** `src/application/usecases/Login.ts`
 - **Fix:** Padronizar para snake_case (`access_token`, `refresh_token`)
 - **Status:** COMMITTED (commit 543dc01)
 
 ### 2. Auto-Login on Register ✅
+
 - **Arquivo:** `src/interfaces/http/controllers/AuthController.ts`
 - **Fix:** Register agora faz login automático e retorna tokens
 - **Status:** COMMITTED (commit 543dc01)
 
 ### 3. User in Auth Response ✅
+
 - **Arquivo:** `src/application/usecases/Login.ts`
 - **Fix:** Adicionar `user: { id, email }` na resposta
 - **Status:** COMMITTED (commit 543dc01)
 
 ### 4. API URL Correction ✅
+
 - **Arquivo:** `frontend/lib/api/client.ts`
 - **Fix:** Corrigir porta de 3001 para 5000
 - **Status:** COMMITTED
 
 ### 5. Home Page Authentication Bypass ✅
+
 - **Arquivo:** `frontend/app/page.tsx`
 - **Fix:** Remover redirecionamento de autenticação para dev
 - **Status:** COMMITTED
@@ -38,10 +43,12 @@
 ## 🔴 CRITICAL ISSUES - PRÓXIMAS AÇÕES
 
 ### #001: Secrets Expostos em .env
+
 **Severidade:** CRITICAL  
 **Arquivo:** `.env`, `.env.local`, `.env.example`  
 **Problema:** TMDB_BEARER_TOKEN e JWT secrets em plaintext  
 **Fix:**
+
 ```bash
 # Regerar secrets:
 - Novo TMDB_BEARER_TOKEN (gerar em https://www.themoviedb.org/settings/api)
@@ -55,10 +62,12 @@
 ---
 
 ### #002: Sem Validação de Input (ANY types)
+
 **Severidade:** CRITICAL  
 **Arquivos:** `AuthController.ts`, `WatchlistController.ts`  
 **Problema:** Controllers aceitam qualquer dados sem schema validation  
 **Fix:**
+
 ```typescript
 // Instalar Zod
 npm install zod
@@ -93,37 +102,41 @@ const validated = RegisterSchema.parse(req.body);
 ---
 
 ### #003: Broken Access Control (sem ownership)
+
 **Severidade:** CRITICAL  
 **Arquivos:** `WatchlistController.ts`, `src/application/usecases/*`  
 **Problema:** Usuário consegue acessar watchlist de outros usuários  
 **Fix:**
+
 ```typescript
 // Em getWatchlistItems:
 // 1. Verificar se profileId pertence ao user autenticado
 const profile = await profileRepository.findById(profileId);
 if (profile?.userId !== req.user.id) {
-  throw new ForbiddenError('Acesso negado');
+  throw new ForbiddenError("Acesso negado");
 }
 
 // 2. Mesmo para addToWatchlist
 const profile = await profileRepository.findById(profileId);
 if (profile?.userId !== req.user.id) {
-  throw new ForbiddenError('Você não pode adicionar para este profile');
+  throw new ForbiddenError("Você não pode adicionar para este profile");
 }
 ```
 
 ---
 
 ### #004: Type Hits - ANY types
+
 **Severidade:** CRITICAL  
 **Arquivos:** `TokenService.ts`, `TmdbClient.ts`, middleware auth  
 **Problema:** Múltiplos `any` em pontos críticos de segurança  
 **Fix:**
+
 ```typescript
 // TokenService.ts
 interface TokenPayload {
   sub: string;
-  type: 'access' | 'refresh';
+  type: "access" | "refresh";
   iat: number;
   exp: number;
 }
@@ -143,10 +156,12 @@ interface AuthRequest extends Request {
 ---
 
 ### #005: Token Revocation em Memória
+
 **Severidade:** CRITICAL  
 **Arquivo:** `src/application/usecases/RefreshToken.ts`  
 **Problema:** Set<> perde tokens revogados em reboot  
 **Fix:**
+
 ```typescript
 // Usar Redis ao invés de Set em memória
 // Instalar redis
@@ -161,7 +176,7 @@ async execute(input) {
   if (isRevoked) {
     throw new UnauthorizedError('Token já foi utilizado');
   }
-  
+
   // Revogar token em Redis (expira em 7 dias)
   await this.redis.setex(`revoked_token:${input.refreshToken}`, 604800, '1');
 }
@@ -170,17 +185,19 @@ async execute(input) {
 ---
 
 ### #006: Brute Force Protection em Memória
+
 **Severidade:** CRITICAL  
 **Arquivo:** `src/application/usecases/Login.ts`  
 **Problema:** Contador de falhas perde em restart  
 **Fix:**
+
 ```typescript
 // Usar Redis
 // Em LoginUseCase:
 async checkBruteForceProtection(email: string) {
   const attempts = await this.redis.get(`login_attempts:${email}`);
   const attemptCount = parseInt(attempts || '0', 10);
-  
+
   if (attemptCount >= 5) {
     const lockoutKey = `login_lockout:${email}`;
     const lockout = await this.redis.get(lockoutKey);
@@ -196,7 +213,7 @@ async checkBruteForceProtection(email: string) {
 async recordFailedAttempt(email: string) {
   await this.redis.incr(`login_attempts:${email}`);
   await this.redis.expire(`login_attempts:${email}`, 900); // 15 min
-  
+
   const count = await this.redis.get(`login_attempts:${email}`);
   if (parseInt(count, 10) >= 5) {
     await this.redis.setex(`login_lockout:${email}`, 900, '1');
@@ -209,6 +226,7 @@ async recordFailedAttempt(email: string) {
 ## ⚠️ HIGH PRIORITY FIXES
 
 ### #010: Sem Logging de Segurança
+
 ```typescript
 // Adicionar winston ou pino para logging
 npm install pino
@@ -222,17 +240,19 @@ logger.error(`Brute force lockout: ${email}`);
 ---
 
 ### #011: CORS Muito Permissivo
+
 **Arquivo:** `src/interfaces/http/app.ts`  
 **Fix:**
+
 ```typescript
 // Ao invés de:
-origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+origin: process.env.FRONTEND_URL || "http://localhost:3000";
 
 // Usar whitelist:
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://yourdomain.com',
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://yourdomain.com",
 ];
 
 cors({
@@ -240,20 +260,22 @@ cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed'));
+      callback(new Error("CORS not allowed"));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'DELETE', 'PUT'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ["GET", "POST", "DELETE", "PUT"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 });
 ```
 
 ---
 
 ### #013: Rate Limit Inadequado
+
 **Arquivo:** `src/interfaces/http/app.ts`  
 **Fix:**
+
 ```typescript
 // Para auth, usar limite mais baixo:
 const authLimiter = rateLimit({
@@ -276,25 +298,28 @@ app.use(limiter);
 ---
 
 ### #014: Sem Auto-Logout no Frontend
+
 **Arquivo:** `frontend/contexts/auth.tsx`  
 **Fix:**
+
 ```typescript
 // Adicionar useEffect para monitorar token expiração:
 useEffect(() => {
   const checkTokenExpiry = setInterval(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (token) {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
+      const decoded = JSON.parse(atob(token.split(".")[1]));
       const expiresIn = decoded.exp * 1000 - Date.now();
-      
-      if (expiresIn < 60000) { // Menos de 1 minuto
+
+      if (expiresIn < 60000) {
+        // Menos de 1 minuto
         // Auto-logout
         logout();
-        toast.error('Sessão expirada. Faça login novamente.');
+        toast.error("Sessão expirada. Faça login novamente.");
       }
     }
   }, 30000); // Verificar a cada 30s
-  
+
   return () => clearInterval(checkTokenExpiry);
 }, []);
 ```
@@ -323,6 +348,7 @@ useEffect(() => {
 ## 🚀 PRÓXIMOS PASSOS
 
 ### **HOJE (Priority 1):**
+
 1. Matar backend antigo (Ctrl+C)
 2. npm install zod
 3. Implementar schemas de validação
@@ -330,12 +356,14 @@ useEffect(() => {
 5. Rebuild e testar
 
 ### **ESTA SEMANA (Priority 2):**
-6. Setup Redis para session management  
+
+6. Setup Redis para session management
 7. Implementar logging
 8. Auto-logout frontend
 9. Audit npm dependencies
 
 ### **PRÓXIMA SPRINT:**
+
 10. Email double opt-in
 11. Advanced security tests
 12. Penetration testing
@@ -344,14 +372,14 @@ useEffect(() => {
 
 ## 📊 Impacto das Correções
 
-| Fix | Impacto | Tempo |
-|-----|--------|-------|
-| Validação Zod | Bloqueia ataques | 1h |
-| Ownership checks | Previne data leak | 2h |
-| Type hints | Menos bugs | 1.5h |
-| Redis | Permissões persist | 2h |
-| Rate limit | DDoS protection | 0.5h |
-| Auto-logout | UX/Security | 0.5h |
+| Fix              | Impacto            | Tempo |
+| ---------------- | ------------------ | ----- |
+| Validação Zod    | Bloqueia ataques   | 1h    |
+| Ownership checks | Previne data leak  | 2h    |
+| Type hints       | Menos bugs         | 1.5h  |
+| Redis            | Permissões persist | 2h    |
+| Rate limit       | DDoS protection    | 0.5h  |
+| Auto-logout      | UX/Security        | 0.5h  |
 
 **Total estimado:** ~7 horas
 

@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 export default function Home() {
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex flex-col items-center justify-center px-4">
       {/* Header */}

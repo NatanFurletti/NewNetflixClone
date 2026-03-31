@@ -157,6 +157,7 @@ docker logs netflix-clone-redis
 ### 3. Executar Aplicações
 
 #### Terminal 1: Backend
+
 ```bash
 cd backend
 npm run dev
@@ -165,6 +166,7 @@ npm run dev
 ```
 
 #### Terminal 2: Frontend
+
 ```bash
 cd frontend
 npm run dev
@@ -172,6 +174,7 @@ npm run dev
 ```
 
 #### Terminal 3: Prisma Studio (Opcional)
+
 ```bash
 cd backend
 npm run prisma:studio
@@ -695,7 +698,7 @@ Response: { status: "ok", timestamp: "..." }
 
 3. Aguardar healthcheck
    docker ps --format "{{.Names}} {{.Status}}"
-   
+
 4. Resetar containers
    npm run docker:down
    npm run docker:up
@@ -933,5 +936,5 @@ Scenario 3: Outage Memory
 ---
 
 **FIM DO GUIA DE DEPLOYMENT E TESTING**  
-*Gerado em 31 de Março de 2026*  
-*Status: ✅ PRODUCTION READY*
+_Gerado em 31 de Março de 2026_  
+_Status: ✅ PRODUCTION READY_

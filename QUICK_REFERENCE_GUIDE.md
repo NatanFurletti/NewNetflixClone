@@ -2,7 +2,7 @@
 
 **Documento:** Quick Reference  
 **Data:** 31 de Março de 2026  
-**Público:** Developers, DevOps, QA Engineers  
+**Público:** Developers, DevOps, QA Engineers
 
 ---
 
@@ -10,17 +10,17 @@
 
 ### Projeto Status
 
-| Métrica | Valor | Status |
-|---------|-------|--------|
-| **Arquitetura** | Clean Architecture | ✅ Completo |
-| **TypeScript Strict** | 100% | ✅ Implementado |
-| **Testes Unitários** | 70% coverage | ✅ Ativo |
-| **Segurança** | JWT + BCrypt | ✅ Forte |
-| **Database** | PostgreSQL Prisma | ✅ Normalizado |
-| **Cache** | Redis + In-Memory | ✅ Funcional |
-| **API Endpoints** | 9 rotas | ✅ Completo |
-| **Frontend Pages** | 6 páginas | ✅ Pronto |
-| **Deployment Ready** | Docker Compose | ✅ Sim |
+| Métrica               | Valor              | Status          |
+| --------------------- | ------------------ | --------------- |
+| **Arquitetura**       | Clean Architecture | ✅ Completo     |
+| **TypeScript Strict** | 100%               | ✅ Implementado |
+| **Testes Unitários**  | 70% coverage       | ✅ Ativo        |
+| **Segurança**         | JWT + BCrypt       | ✅ Forte        |
+| **Database**          | PostgreSQL Prisma  | ✅ Normalizado  |
+| **Cache**             | Redis + In-Memory  | ✅ Funcional    |
+| **API Endpoints**     | 9 rotas            | ✅ Completo     |
+| **Frontend Pages**    | 6 páginas          | ✅ Pronto       |
+| **Deployment Ready**  | Docker Compose     | ✅ Sim          |
 
 ---
 
@@ -61,26 +61,26 @@ npm run dev                # http://localhost:3000
 
 ### Auth Routes
 
-| Method | Route | Auth | Descrição |
-|--------|-------|------|-----------|
-| POST | `/api/auth/register` | ❌ | Registrar usuário |
-| POST | `/api/auth/login` | ❌ | Fazer login |
-| POST | `/api/auth/refresh` | ❌ | Renovar token |
+| Method | Route                | Auth | Descrição         |
+| ------ | -------------------- | ---- | ----------------- |
+| POST   | `/api/auth/register` | ❌   | Registrar usuário |
+| POST   | `/api/auth/login`    | ❌   | Fazer login       |
+| POST   | `/api/auth/refresh`  | ❌   | Renovar token     |
 
 ### Profile Routes
 
-| Method | Route | Auth | Descrição |
-|--------|-------|------|-----------|
-| POST | `/api/profiles` | ✅ | Criar perfil |
-| GET | `/api/profiles` | ✅ | Listar perfis |
+| Method | Route           | Auth | Descrição     |
+| ------ | --------------- | ---- | ------------- |
+| POST   | `/api/profiles` | ✅   | Criar perfil  |
+| GET    | `/api/profiles` | ✅   | Listar perfis |
 
 ### Watchlist Routes
 
-| Method | Route | Auth | Descrição |
-|--------|-------|------|-----------|
-| GET | `/api/watchlist/:profileId` | ✅ | Listar watchlist |
-| POST | `/api/watchlist` | ✅ | Adicionar item |
-| DELETE | `/api/watchlist/:id` | ✅ | Remover item |
+| Method | Route                       | Auth | Descrição        |
+| ------ | --------------------------- | ---- | ---------------- |
+| GET    | `/api/watchlist/:profileId` | ✅   | Listar watchlist |
+| POST   | `/api/watchlist`            | ✅   | Adicionar item   |
+| DELETE | `/api/watchlist/:id`        | ✅   | Remover item     |
 
 ---
 
@@ -346,15 +346,15 @@ npm run lint              # ESLint
 
 ## ⚠️ PROBLEMAS COMUNS & SOLUÇÕES
 
-| Problema | Solução |
-|----------|---------|
-| **502 Bad Gateway** | Backend não respondendo / Restart backend |
-| **401 Unauthorized** | Token expirado / Fazer novo login |
-| **CORS Error** | CORS_ORIGIN incorreto / Verificar .env |
-| **Database Connection** | PostgreSQL down / `npm run docker:up` |
-| **Redis Connection** | Redis down / Fallback in-memory ativo |
-| **Weak Password** | < 8 chars, falta uppercase/número |
-| **Rate Limit (429)** | Esperar 1 minuto / Aumentar limite |
+| Problema                | Solução                                   |
+| ----------------------- | ----------------------------------------- |
+| **502 Bad Gateway**     | Backend não respondendo / Restart backend |
+| **401 Unauthorized**    | Token expirado / Fazer novo login         |
+| **CORS Error**          | CORS_ORIGIN incorreto / Verificar .env    |
+| **Database Connection** | PostgreSQL down / `npm run docker:up`     |
+| **Redis Connection**    | Redis down / Fallback in-memory ativo     |
+| **Weak Password**       | < 8 chars, falta uppercase/número         |
+| **Rate Limit (429)**    | Esperar 1 minuto / Aumentar limite        |
 
 ---
 
@@ -439,14 +439,14 @@ Benefícios:
 
 ## 📞 CONTATO & SUPORTE
 
-| Recurso | Link/Email |
-|---------|-----------|
+| Recurso               | Link/Email                                   |
+| --------------------- | -------------------------------------------- |
 | **GitHub Repository** | https://github.com/seu-usuario/netflix-clone |
-| **Issue Tracking** | GitHub Issues |
-| **Documentation** | Veja arquivos *.md |
-| **API Docs** | backend/README.md |
-| **Setup Guide** | backend/SETUP.md |
-| **Deployment Guide** | Veja DEPLOYMENT_AND_TESTING_GUIDE.md |
+| **Issue Tracking**    | GitHub Issues                                |
+| **Documentation**     | Veja arquivos \*.md                          |
+| **API Docs**          | backend/README.md                            |
+| **Setup Guide**       | backend/SETUP.md                             |
+| **Deployment Guide**  | Veja DEPLOYMENT_AND_TESTING_GUIDE.md         |
 
 ---
 
@@ -463,18 +463,21 @@ Benefícios:
 ## 🎓 RECURSOS DE APRENDIZADO
 
 ### Backend
+
 - Clean Architecture: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 - Express.js: https://expressjs.com/
 - Prisma: https://www.prisma.io/
 - JWT: https://jwt.io/
 
 ### Frontend
+
 - Next.js: https://nextjs.org/learn
 - React: https://react.dev
 - Tailwind CSS: https://tailwindcss.com
 - TypeScript: https://www.typescriptlang.org
 
 ### DevOps
+
 - Docker: https://docs.docker.com/
 - Docker Compose: https://docs.docker.com/compose/
 - PostgreSQL: https://www.postgresql.org/docs/
@@ -507,4 +510,4 @@ Pronto para:
 **Última Atualização:** 31 de Março de 2026  
 **Status:** ✅ PRODUCTION READY
 
-*Para dúvidas, consulte a documentação completa ou entre em contato com a equipe.*
+_Para dúvidas, consulte a documentação completa ou entre em contato com a equipe._

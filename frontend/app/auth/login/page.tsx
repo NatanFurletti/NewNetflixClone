@@ -28,7 +28,10 @@ export default function LoginPage() {
       await login(email, password);
       toast.success("Login successful!");
     } catch (error: any) {
-      const message = error?.response?.data?.error || error?.response?.data?.message || "Login failed";
+      const message =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        "Login failed";
       toast.error(message);
     } finally {
       setIsLoading(false);

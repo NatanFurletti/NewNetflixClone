@@ -1,4 +1,5 @@
 # 🔐 SECURITY AUDIT & QA REVIEW - Netflix Clone
+
 **Data:** 31 de Março de 2026  
 **Reviewer:** Code Auditor Sênior  
 **Status:** ⚠️ **18 ISSUES ENCONTRADOS** (9 CRITICAL, 5 HIGH, 4 MEDIUM)
@@ -7,27 +8,30 @@
 
 ## 📊 RESUMO EXECUTIVO
 
-| Categoria | Total | CRITICAL | HIGH | MEDIUM | LOW |
-|-----------|-------|----------|------|--------|-----|
-| Backend | 12 | 6 | 3 | 2 | 1 |
-| Frontend | 4 | 2 | 1 | 1 | 0 |
-| Deployment | 2 | 1 | 1 | 0 | 0 |
-| **TOTAL** | **18** | **9** | **5** | **3** | **1** |
+| Categoria  | Total  | CRITICAL | HIGH  | MEDIUM | LOW   |
+| ---------- | ------ | -------- | ----- | ------ | ----- |
+| Backend    | 12     | 6        | 3     | 2      | 1     |
+| Frontend   | 4      | 2        | 1     | 1      | 0     |
+| Deployment | 2      | 1        | 1     | 0      | 0     |
+| **TOTAL**  | **18** | **9**    | **5** | **3**  | **1** |
 
 ---
 
 # 🛑 CRITICAL ISSUES (9)
 
 ## ISSUE #001 - CRITICAL: Secrets Expostos no .env Commitado
+
 **Arquivo:** [backend/.env](backend/.env)  
-**Problema:**   
+**Problema:**
+
 - TMDB_BEARER_TOKEN está em PLAINTEXT no arquivo .env
 - TMDB_API_KEY exposto (5098d21b5daa56bbc7e25777089278c3)
 - JWT_ACCESS_SECRET e JWT_REFRESH_SECRET são values placeholder muito curtos (~35 chars vs 32 min recomendado)
 - Arquivo .env deve estar no `.gitignore` mas foi commitado
 - **Risco:** Qualquer pessoa com acesso ao repositório tem credenciais reais
 
-**Recomendação:**  
+**Recomendação:**
+
 ```bash
 # 1. Regenerar TODOS os secrets no TMDB console
 tm# 2. Adicionar ao .gitignore:
@@ -48,21 +52,25 @@ JWT_REFRESH_SECRET=<gerar com: openssl rand -base64 32>
 ---
 
 ## ISSUE #002 - CRITICAL: Sem Validação de Input (SQL Injection Potencial)
+
 **Arquivo:** [backend/src/interfaces/http/controllers/WatchlistController.ts](backend/src/interfaces/http/controllers/WatchlistController.ts#L93-L94)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 // VULNERABLE - Sem validação!
 const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
 ```
+
 - `parseInt()` sem validação de range → pode enviar `limit=-999999` ou `NaN`
 - Sem validação de tipo de dados em `req.body`
 - Controllers aceitam ANY input sem Zod/schema validation
 - Possibilidade de resource exhaustion (limit muito grande)
 
 **Recomendação:**
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 // Criar schemas Zod em cada controller
 const paginationSchema = z.object({
@@ -85,14 +93,16 @@ const result = await this.getWatchlistItemsUseCase.execute({
 ---
 
 ## ISSUE #003 - CRITICAL: Falta de Autorização (Broken Access Control)
+
 **Arquivo:** [backend/src/interfaces/http/controllers/WatchlistController.ts](backend/src/interfaces/http/controllers/WatchlistController.ts#L92-L101)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 // FALTA VERIFICAÇÃO DE OWNERSHIP!
 async getWatchlistItems(req: Request, res: Response): Promise<void> {
   const { profileId } = req.params;
   // ❌ NÃO verifica se profileId pertence ao req.userId autenticado
-  
+
   const result = await this.getWatchlistItemsUseCase.execute({
     profileId, // Usuário pode pedir watchlist de OUTRO usuário!
     limit,
@@ -102,6 +112,7 @@ async getWatchlistItems(req: Request, res: Response): Promise<void> {
 ```
 
 **Risco de Exploração:**
+
 ```bash
 # Atacante autenticado como user123
 GET /api/watchlist/altro-user-profile-id
@@ -109,6 +120,7 @@ GET /api/watchlist/altro-user-profile-id
 ```
 
 **Recomendação:**
+
 ```typescript
 async getWatchlistItems(req: Request, res: Response): Promise<void> {
   const { profileId } = req.params;
@@ -134,8 +146,10 @@ async getWatchlistItems(req: Request, res: Response): Promise<void> {
 ---
 
 ## ISSUE #004 - CRITICAL: Type Hints Faltando (ANY em Pontos Críticos)
+
 **Arquivo:** [backend/src/application/usecases/GetTrendingMovies.ts](backend/src/application/usecases/GetTrendingMovies.ts#L31)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 // Múltiplos ANY types que ocultam bugs
 export async execute(): Promise<any[]> { // ❌ ANY como retorno
@@ -152,11 +166,13 @@ constructor(private redis: any) {} // ❌ Tipo Redis desconhecido
 ```
 
 **Risco:**
+
 - Reflexo de tipos em runtime (pode quebrar em produção)
 - IDE autocomplete não funciona
 - Falha em refatorações
 
 **Recomendação:**
+
 ```typescript
 // Criar tipos específicos
 interface IMovie {
@@ -188,8 +204,10 @@ export async execute(): Promise<IMovie[]> {
 ---
 
 ## ISSUE #005 - CRITICAL: Token Revocation em Memória (Perda em Restart)
+
 **Arquivo:** [backend/src/application/usecases/RefreshToken.ts](backend/src/application/usecases/RefreshToken.ts#L13)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 export class RefreshTokenUseCase {
   private revokedTokens: Set<string> = new Set(); // ❌ EM MEMÓRIA!
@@ -207,11 +225,13 @@ export class RefreshTokenUseCase {
 ```
 
 **Cenário de Ataque:**
+
 1. Servidor reinicia
 2. `revokedTokens` é limpo (Set vazio)
 3. Tokens revogados são reusáveis!
 
 **Recomendação:**
+
 ```typescript
 // Usar banco de dados ou Redis para token blacklist
 export class RefreshTokenUseCase {
@@ -242,10 +262,12 @@ export class RefreshTokenUseCase {
 ---
 
 ## ISSUE #006 - CRITICAL: Brute Force Apenas em Memória
+
 **Arquivo:** [backend/src/application/usecases/Login.ts](backend/src/application/usecases/Login.ts#L14)  
-**Problema:**  
+**Problema:**
+
 ```typescript
-private failedAttempts: Map<string, { count: number; lastAttempt: number }> = 
+private failedAttempts: Map<string, { count: number; lastAttempt: number }> =
   new Map(); // ❌ EM MEMÓRIA
 
 async execute(input: { email: string; password: string }): Promise<...> {
@@ -256,11 +278,13 @@ async execute(input: { email: string; password: string }): Promise<...> {
 ```
 
 **Cenário de Ataque:**
+
 1. Atacante faz 5 tentativas falhadas
 2. Servidor reinicia
 3. Contador zerado! Atacante continua
 
 **Recomendação:**
+
 ```typescript
 // Mover para Redis com TTL
 export class LoginUseCase {
@@ -293,12 +317,14 @@ export class LoginUseCase {
 ---
 
 ## ISSUE #007 - CRITICAL: Sem Validação de Ownership em Watchlist
+
 **Arquivo:** [backend/src/interfaces/http/controllers/WatchlistController.ts](backend/src/interfaces/http/controllers/WatchlistController.ts#L57-L70)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 async addToWatchlist(req: Request, res: Response): Promise<void> {
   const { profileId, tmdbId, mediaType, title, posterPath } = req.body;
-  
+
   // ❌ Não verifica se profileId é do usuário autenticado!
   const result = await this.addToWatchlistUseCase.execute({
     profileId, // Pode ser de outro usuário
@@ -315,8 +341,10 @@ async addToWatchlist(req: Request, res: Response): Promise<void> {
 ---
 
 ## ISSUE #008 - CRITICAL: Senha Fraca não Rejeita Todas as Variações
+
 **Arquivo:** [backend/src/application/services/PasswordService.ts](backend/src/application/services/PasswordService.ts#L8)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 private static readonly PASSWORD_REGEX =
   /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
@@ -327,12 +355,14 @@ static isStrong(password: string): boolean {
 ```
 
 **Validações Faltando:**
+
 - Sem limite máximo de tamanho (memória exhaustion)
 - Não detecta senhas comuns (password123, Abc123456)
 - Regex permite caracteres repetidos perigosos
 - Sem proteção contra homograph attacks
 
 **Recomendação:**
+
 ```typescript
 private static readonly PASSWORD_MIN_LENGTH = 8;
 private static readonly PASSWORD_MAX_LENGTH = 128; // ADD MAX
@@ -340,15 +370,15 @@ private static readonly COMMON_PASSWORDS = ['password', 'Admin123', '123456'];
 
 static validateStrength(password: string): void {
   // 1. Range
-  if (password.length < this.PASSWORD_MIN_LENGTH || 
+  if (password.length < this.PASSWORD_MIN_LENGTH ||
       password.length > this.PASSWORD_MAX_LENGTH) {
     throw new WeakPasswordError();
   }
 
   // 2. Regex (maiúscula, número, caractere especial)
-  const passwordRegex = 
+  const passwordRegex =
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,128}$/;
-  
+
   if (!passwordRegex.test(password)) {
     throw new WeakPasswordError();
   }
@@ -366,53 +396,62 @@ static validateStrength(password: string): void {
 ---
 
 ## ISSUE #009 - CRITICAL: Sem X-CSRF-Token ou SameSite Cookie
+
 **Arquivo:** [backend/src/interfaces/http/app.ts](backend/src/interfaces/http/app.ts#L23-L27)  
-**Problema:**  
+**Problema:**
+
 ```typescript
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true, // ❌ Sem SameSite ou CSRF token validation
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true, // ❌ Sem SameSite ou CSRF token validation
+  }),
+);
 
 // ❌ Sem proteção CSRF em POST/DELETE
 app.use(express.json());
 ```
 
 **Risco:**
+
 - CSRF attacks possíveis (cross-site request forgery)
 - Form submission de site malicioso pode ser aceita
 
 **Recomendação:**
+
 ```typescript
-import csrf from 'csurf'; // npm install csurf
+import csrf from "csurf"; // npm install csurf
 
 // Setup CSRF
 const csrfProtection = csrf({ cookie: false }); // sessionStorage para token
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-  optionsSuccessStatus: 200,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Endpoint para obter CSRF token no frontend
-app.get('/api/csrf-token', csrfProtection, (req, res) => {
+app.get("/api/csrf-token", csrfProtection, (req, res) => {
   res.json({ token: req.csrfToken() });
 });
 
 // Proteger POST/DELETE/PUT
-app.post('/api/auth/login', csrfProtection, authController.login);
-app.post('/api/watchlist', csrfProtection, authController.addToWatchlist);
+app.post("/api/auth/login", csrfProtection, authController.login);
+app.post("/api/watchlist", csrfProtection, authController.addToWatchlist);
 ```
 
 **Frontend:**
+
 ```typescript
 // Recuperar token antes de POST
-const response = await apiClient.get('/csrf-token');
+const response = await apiClient.get("/csrf-token");
 const csrfToken = response.data.token;
 
 // Enviar em header
-apiClient.defaults.headers.post['X-CSRF-Token'] = csrfToken;
+apiClient.defaults.headers.post["X-CSRF-Token"] = csrfToken;
 ```
 
 **Severidade:** CRITICAL 🔴  
@@ -423,16 +462,18 @@ apiClient.defaults.headers.post['X-CSRF-Token'] = csrfToken;
 # ⚠️ HIGH SEVERITY ISSUES (5)
 
 ## ISSUE #010 - HIGH: Sem Logging e Auditoria de Segurança
+
 **Arquivo:** [backend/src/interfaces/http/middlewares/errorHandler.ts](backend/src/interfaces/http/middlewares/errorHandler.ts)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 export function errorHandler(
   err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void {
-  console.error('Error:', err); // ❌ Apenas console.error
+  console.error("Error:", err); // ❌ Apenas console.error
   // Sem:
   // - IP do atacante
   // - Request ID para correlação
@@ -443,14 +484,16 @@ export function errorHandler(
 ```
 
 **Impacto:**
+
 - Impossível investigar ataques
 - Impossível detectar padrões de ataque
 - Sem rastreabilidade de erros críticos
 
 **Recomendação:**
+
 ```typescript
-import winston from 'winston'; // npm install winston
-import { v4 as uuidv4 } from 'uuid';
+import winston from "winston"; // npm install winston
+import { v4 as uuidv4 } from "uuid";
 
 declare global {
   namespace Express {
@@ -468,11 +511,11 @@ app.use((req, res, next) => {
 
 // Logger estruturado
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
   ],
 });
 
@@ -480,11 +523,11 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void {
   logger.error({
     message: err.message,
-    code: err.code || 'UNKNOWN',
+    code: err.code || "UNKNOWN",
     ip: req.ip,
     userId: req.userId,
     requestId: req.id,
@@ -501,7 +544,7 @@ export function errorHandler(
     });
   } else {
     res.status(500).json({
-      error: 'Internal server error',
+      error: "Internal server error",
       requestId: req.id,
     });
   }
@@ -514,42 +557,50 @@ export function errorHandler(
 ---
 
 ## ISSUE #011 - HIGH: CORS Muito Permissivo em Desenvolvimento
+
 **Arquivo:** [backend/src/interfaces/http/app.ts](backend/src/interfaces/http/app.ts#L24)  
-**Problema:**  
+**Problema:**
+
 ```typescript
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true, // ❌ Fallback inseguro para localhost
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true, // ❌ Fallback inseguro para localhost
+  }),
+);
 ```
 
 **Risco:**
+
 - Se `FRONTEND_URL` não definido, escuta em `http://localhost:3000`
 - Em produção sem variável, qualquer localhost pode acessar
 - Desenvolvedor pode esquecer de remover variável local
 
 **Recomendação:**
+
 ```typescript
 // Whitelist explícita
 const allowedOrigins = [
-  'https://netflix-clone.vercel.app', // Produção
-  'https://staging.netflix-clone.app', // Staging
-  ...(process.env.NODE_ENV === 'development' 
-    ? ['http://localhost:3000', 'http://localhost:3001'] 
+  "https://netflix-clone.vercel.app", // Produção
+  "https://staging.netflix-clone.app", // Staging
+  ...(process.env.NODE_ENV === "development"
+    ? ["http://localhost:3000", "http://localhost:3001"]
     : []),
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS blocked'));
-    }
-  },
-  credentials: true,
-  maxAge: 3600, // Pre-flight cache 1 hora
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS blocked"));
+      }
+    },
+    credentials: true,
+    maxAge: 3600, // Pre-flight cache 1 hora
+  }),
+);
 ```
 
 **Severidade:** HIGH 🟠  
@@ -558,8 +609,10 @@ app.use(cors({
 ---
 
 ## ISSUE #012 - HIGH: Sem Validação de Email (Email Spoofing)
+
 **Arquivo:** [backend/src/application/usecases/RegisterUser.ts](backend/src/application/usecases/RegisterUser.ts#L22-L24)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 private isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -568,20 +621,22 @@ private isValidEmail(email: string): boolean {
 ```
 
 **Emails "Válidos" Perigosos:**
+
 - `user@example.` ❌ Sem TLD válido
 - `user@@example.com` ❌ Duplo @
 - `user@127.0.0.1` ❌ IP sem validação
 - `user+alias@example.com` ❌ Sem sanitizar '+'
 
 **Recomendação:**
+
 ```typescript
 import { isEmail } from 'validator'; // npm install validator
 
 static validateEmail(email: string): boolean {
   if (email.length > 254) return false; // RFC 5321
-  
+
   // Usar biblioteca de validação confiável
-  return isEmail(email, { 
+  return isEmail(email, {
     allow_display_name: false,
     require_tld: true,
   });
@@ -602,7 +657,7 @@ async register(input: { email: string; password: string }) {
 
   // 3. Enviar email de verificação
   const verification = await this.emailService.sendVerification(input.email);
-  
+
   // 4. Criar usuário COM EMAIL NÃO VERIFICADO
   const user = User.create({
     id: uuid(),
@@ -619,13 +674,15 @@ async register(input: { email: string; password: string }) {
 ---
 
 ## ISSUE #013 - HIGH: Sem Rate Limit Específico para Auth
+
 **Arquivo:** [backend/src/interfaces/http/app.ts](backend/src/interfaces/http/app.ts#L29-L34)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,    // 15 minutos
-  max: 100,                     // ❌ 100 requests (muito permissivo para auth!)
-  message: 'Muitas requisições',
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // ❌ 100 requests (muito permissivo para auth!)
+  message: "Muitas requisições",
 });
 app.use(limiter); // ❌ Limiter GLOBAL
 
@@ -634,20 +691,22 @@ app.use(limiter); // ❌ Limiter GLOBAL
 ```
 
 **Impacto:**
+
 - Brute force em login com 100 tentativas
 - Sem limite específico por endpoint
 
 **Recomendação:**
+
 ```typescript
 // Rate limiter específico para auth
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 5, // ❌ Máximo 5 tentativas (em vez de 100!)
-  skip: (req) => req.method !== 'POST',
+  skip: (req) => req.method !== "POST",
   keyGenerator: (req) => req.body.email || req.ip, // Limitar por email
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Muitas tentativas de login. Tente novamente em 15 minutos',
+      error: "Muitas tentativas de login. Tente novamente em 15 minutos",
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
     });
   },
@@ -660,9 +719,9 @@ const generalLimiter = rateLimit({
 });
 
 app.use(generalLimiter);
-app.post('/auth/login', authLimiter, authController.login);
-app.post('/auth/register', authLimiter, authController.register);
-app.post('/auth/refresh', authLimiter, authController.refreshToken);
+app.post("/auth/login", authLimiter, authController.login);
+app.post("/auth/register", authLimiter, authController.register);
+app.post("/auth/refresh", authLimiter, authController.refreshToken);
 ```
 
 **Severidade:** HIGH 🟠  
@@ -671,8 +730,10 @@ app.post('/auth/refresh', authLimiter, authController.refreshToken);
 ---
 
 ## ISSUE #014 - HIGH: Token Expiração em Frontend Sem Auto-Logout
+
 **Arquivo:** [frontend/lib/api/client.ts](frontend/lib/api/client.ts#L25-L48)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 // Na context auth.tsx
 useEffect(() => {
@@ -692,6 +753,7 @@ useEffect(() => {
 ```
 
 **Cenário:**
+
 1. Usuário faz login (token = 15 min)
 2. Fica AFK por 20 minutos
 3. Tenta clicar em algo
@@ -699,8 +761,9 @@ useEffect(() => {
 5. Mas durante esses 20 minutos, state está inconsistente
 
 **Recomendação:**
+
 ```typescript
-import { jwtDecode } from 'jwt-decode'; // npm install jwt-decode
+import { jwtDecode } from "jwt-decode"; // npm install jwt-decode
 
 useEffect(() => {
   const token = localStorage.getItem("access_token");
@@ -709,13 +772,13 @@ useEffect(() => {
     try {
       const decoded = jwtDecode(token);
       const now = Date.now() / 1000;
-      
+
       // 2. Se expirado, fazer logout
       if (decoded.exp && decoded.exp < now) {
         logout();
         return;
       }
-      
+
       // 3. Se expirando em menos de 1 min, renovar
       if (decoded.exp && decoded.exp - now < 60) {
         refreshAccessToken();
@@ -744,11 +807,14 @@ useEffect(() => {
   const decoded = jwtDecode(token);
   const now = Date.now() / 1000;
   const expiresIn = (decoded.exp || 0) - now;
-  
+
   // Renovar 1 minuto antes de expirar
-  const timer = setTimeout(() => {
-    refreshAccessToken();
-  }, (expiresIn - 60) * 1000);
+  const timer = setTimeout(
+    () => {
+      refreshAccessToken();
+    },
+    (expiresIn - 60) * 1000,
+  );
 
   return () => clearTimeout(timer);
 }, [user, token]);
@@ -762,32 +828,36 @@ useEffect(() => {
 # 🟡 MEDIUM SEVERITY ISSUES (3)
 
 ## ISSUE #015 - MEDIUM: Authorization Header CASE Sensitive
+
 **Arquivo:** [backend/src/interfaces/http/middlewares/auth.ts](backend/src/interfaces/http/middlewares/auth.ts#L18)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 const authHeader = req.headers.authorization;
 
-if (!authHeader || !authHeader.startsWith('Bearer ')) {
-  throw new UnauthorizedError('Token não fornecido');
+if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  throw new UnauthorizedError("Token não fornecido");
 }
 ```
 
 **Risco:**
+
 - `authorization` vs `Authorization` → headers são case-insensitive em HTTP
 - Alguns clientes podem enviar `bearer` (lowercase) → rejeição
 
 **Recomendação:**
+
 ```typescript
 const authHeader = req.headers.authorization;
 
 if (!authHeader) {
-  throw new UnauthorizedError('Token não fornecido');
+  throw new UnauthorizedError("Token não fornecido");
 }
 
 // Case-insensitive
 const bearerToken = authHeader.match(/^Bearer\s+(\S+)$/i)?.[1];
 if (!bearerToken) {
-  throw new UnauthorizedError('Token inválido');
+  throw new UnauthorizedError("Token inválido");
 }
 
 const decoded = TokenService.validateToken(bearerToken, jwtAccessSecret);
@@ -799,8 +869,10 @@ const decoded = TokenService.validateToken(bearerToken, jwtAccessSecret);
 ---
 
 ## ISSUE #016 - MEDIUM: Sem Validação de URL em posterPath
+
 **Arquivo:** [backend/src/interfaces/http/controllers/WatchlistController.ts](backend/src/interfaces/http/controllers/WatchlistController.ts#L57)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 const { profileId, tmdbId, mediaType, title, posterPath } = req.body;
 // ❌ posterPath é string qualquer - XSS potencial!
@@ -815,15 +887,19 @@ await this.addToWatchlistUseCase.execute({
 ```
 
 **Recomendação:**
+
 ```typescript
-import { isURL } from 'validator';
+import { isURL } from "validator";
 
 // Na validação
-if (posterPath && !isURL(posterPath, {
-  protocols: ['https'],
-  host_whitelist: ['image.tmdb.org', 'secure.gravatar.com'], // Whitelist
-  require_protocol: true,
-})) {
+if (
+  posterPath &&
+  !isURL(posterPath, {
+    protocols: ["https"],
+    host_whitelist: ["image.tmdb.org", "secure.gravatar.com"], // Whitelist
+    require_protocol: true,
+  })
+) {
   throw new InvalidInputError("posterPath URL inválida");
 }
 
@@ -831,7 +907,7 @@ if (posterPath && !isURL(posterPath, {
 const addToWatchlistSchema = z.object({
   profileId: z.string().cuid(),
   tmdbId: z.number().int().positive(),
-  mediaType: z.enum(['movie', 'tv']),
+  mediaType: z.enum(["movie", "tv"]),
   title: z.string().min(1).max(200),
   posterPath: z.string().url().optional(),
 });
@@ -843,22 +919,26 @@ const addToWatchlistSchema = z.object({
 ---
 
 ## ISSUE #017 - MEDIUM: Docker Compose Credenciais em Plaintext
+
 **Arquivo:** [backend/docker-compose.yml](backend/docker-compose.yml#L10)  
-**Problema:**  
+**Problema:**
+
 ```yaml
 services:
   postgres:
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres  # ❌ HARDCODED!
+      POSTGRES_PASSWORD: postgres # ❌ HARDCODED!
       POSTGRES_DB: netflix_clone
 ```
 
 **Impacto:**
+
 - Docker image pode ter credenciais em layer history
 - `.gitlab-ci.yml` ou CI logs podem expor valores
 
 **Recomendação:**
+
 ```yaml
 # docker-compose.yml (SEM credenciais)
 services:
@@ -892,40 +972,47 @@ POSTGRES_DB=netflix_clone
 # 🔵 LOW SEVERITY ISSUES (1)
 
 ## ISSUE #018 - LOW: Faltam HTTP Security Headers
+
 **Arquivo:** [backend/src/interfaces/http/app.ts](backend/src/interfaces/http/app.ts#L23)  
-**Problema:**  
+**Problema:**
+
 ```typescript
 app.use(helmet()); // ❌ Helmet usa defaults, mas pode ser mais restritivo
 ```
 
 **Headers Faltando:**
+
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
 - `Strict-Transport-Security: max-age=31536000`
 - `Content-Security-Policy: default-src 'self'`
 
 **Recomendação:**
+
 ```typescript
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'nonce-{random}'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Tailwind precisa
-      imgSrc: ["'self'", "https:", "data:"],
-      connectSrc: ["'self'", process.env.API_URL],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : undefined,
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'nonce-{random}'"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Tailwind precisa
+        imgSrc: ["'self'", "https:", "data:"],
+        connectSrc: ["'self'", process.env.API_URL],
+        frameSrc: ["'none'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests:
+          process.env.NODE_ENV === "production" ? [] : undefined,
+      },
     },
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true,
-  },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-}));
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  }),
+);
 ```
 
 **Severidade:** LOW 🔵  
@@ -983,12 +1070,14 @@ app.use(helmet({
 # 📊 SUMMARY BY COMPONENT
 
 ## Backend Architecture: 🟠 MODERATE
+
 - Clean architecture implementada ✅
 - Type safety inadequate (ANY types) ❌
 - Input validation faltando ❌
 - Authorization checks faltando ❌
 
 ## Security Measures: 🔴 WEAK
+
 - Secrets expostos ❌
 - Brute force em memória ❌
 - Token revocation em memória ❌
@@ -996,12 +1085,14 @@ app.use(helmet({
 - Rate limiting inadequado ❌
 
 ## Frontend Security: 🟡 ACCEPTABLE
+
 - Context API bem estruturado ✅
 - Refresh token logic OK ✅
 - Mas sem auto-logout preventivo ❌
 - localStorage sem XSS protection ❌
 
 ## Deployment: 🔴 NOT READY
+
 - Docker compose com hardcoded passwords ❌
 - Environment variables não protegidas ❌
 - Sem health checks para services ⚠️
@@ -1012,4 +1103,3 @@ app.use(helmet({
 **Relatório Gerado:** 31 Mar 2026  
 **Auditor:** Code Security Team  
 **Status:** ⚠️ **NOT PRODUCTION READY** - Corrigir CRITICAL issues antes do deploy
-

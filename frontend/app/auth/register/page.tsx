@@ -50,7 +50,10 @@ export default function RegisterPage() {
       await register(email, password);
       toast.success("Account created!");
     } catch (error: any) {
-      const message = error?.response?.data?.error || error?.response?.data?.message || "Registration failed";
+      const message =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        "Registration failed";
       toast.error(message);
     } finally {
       setIsLoading(false);
