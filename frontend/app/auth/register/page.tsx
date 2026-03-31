@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth";
 import Link from "next/link";
@@ -11,8 +11,15 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +48,7 @@ export default function RegisterPage() {
 
     try {
       await register(email, password);
-      toast.success("Account created! Redirecting to dashboard...");
-      router.push("/dashboard");
+      toast.success("Account created!");
     } catch (error: any) {
       const message = error?.response?.data?.error || error?.response?.data?.message || "Registration failed";
       toast.error(message);
