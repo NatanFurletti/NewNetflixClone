@@ -1,59 +1,61 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import apiClient from '@/lib/api/client'
-import { Profile } from '@/types'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { useEffect, useState } from "react";
+import apiClient from "@/lib/api/client";
+import { Profile } from "@/types";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function DashboardPage() {
-  const [profiles, setProfiles] = useState<Profile[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [newProfileName, setNewProfileName] = useState('')
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newProfileName, setNewProfileName] = useState("");
 
   useEffect(() => {
-    fetchProfiles()
-  }, [])
+    fetchProfiles();
+  }, []);
 
   const fetchProfiles = async () => {
     try {
-      const response = await apiClient.get<Profile[]>('/profiles')
-      setProfiles(response.data)
+      const response = await apiClient.get<Profile[]>("/profiles");
+      setProfiles(response.data);
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Failed to load profiles'
-      toast.error(message)
+      const message =
+        error?.response?.data?.message || "Failed to load profiles";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleCreateProfile = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!newProfileName.trim()) {
-      toast.error('Profile name is required')
-      return
+      toast.error("Profile name is required");
+      return;
     }
 
     try {
-      await apiClient.post('/profiles', { name: newProfileName })
-      toast.success('Profile created!')
-      setNewProfileName('')
-      setShowCreateForm(false)
-      fetchProfiles()
+      await apiClient.post("/profiles", { name: newProfileName });
+      toast.success("Profile created!");
+      setNewProfileName("");
+      setShowCreateForm(false);
+      fetchProfiles();
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Failed to create profile'
-      toast.error(message)
+      const message =
+        error?.response?.data?.message || "Failed to create profile";
+      toast.error(message);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white">Loading profiles...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -70,9 +72,7 @@ export default function DashboardPage() {
           >
             <div className="relative aspect-square bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg overflow-hidden cursor-pointer transform transition group-hover:scale-105">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-6xl">
-                  {profile.isKids ? '👶' : '👤'}
-                </div>
+                <div className="text-6xl">{profile.isKids ? "👶" : "👤"}</div>
               </div>
             </div>
             <h3 className="text-white font-semibold mt-2 text-center">
@@ -132,5 +132,5 @@ export default function DashboardPage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

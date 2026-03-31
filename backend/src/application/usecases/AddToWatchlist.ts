@@ -1,8 +1,8 @@
 // src/application/usecases/AddToWatchlist.ts
 import { v4 as uuid } from "uuid";
-import { WatchlistItem } from "@/domain/entities/WatchlistItem";
-import { DuplicateItemError } from "@/domain/errors/DomainError";
-import { IWatchlistRepository } from "@/domain/repositories/IWatchlistRepository";
+import { WatchlistItem } from "../../domain/entities/WatchlistItem";
+import { DuplicateItemError } from "../../domain/errors/DomainError";
+import { IWatchlistRepository } from "../../domain/repositories/IWatchlistRepository";
 
 /**
  * Use Case: Adicionar item à watchlist

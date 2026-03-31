@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { useAuth } from '@/contexts/auth'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useAuth } from "@/contexts/auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   if (isAuthenticated) {
-    return null
+    return null;
   }
 
   return (
@@ -73,5 +73,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }

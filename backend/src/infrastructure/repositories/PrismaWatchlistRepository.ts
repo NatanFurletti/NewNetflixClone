@@ -1,7 +1,7 @@
 // src/infrastructure/repositories/PrismaWatchlistRepository.ts
-import { PrismaClient } from '@prisma/client';
-import { WatchlistItem } from '@/domain/entities/WatchlistItem';
-import { IWatchlistRepository } from '@/domain/repositories/IWatchlistRepository';
+import { PrismaClient } from "@prisma/client";
+import { WatchlistItem } from "../../domain/entities/WatchlistItem";
+import { IWatchlistRepository } from "../../domain/repositories/IWatchlistRepository";
 
 export class PrismaWatchlistRepository implements IWatchlistRepository {
   constructor(private prisma: PrismaClient) {}
@@ -32,16 +32,16 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
       data.id,
       data.profileId,
       data.tmdbId,
-      data.mediaType as 'movie' | 'tv',
+      data.mediaType as "movie" | "tv",
       data.title,
-      data.posterPath
+      data.posterPath,
     );
   }
 
   async findByProfileAndTmdbId(
     profileId: string,
     tmdbId: number,
-    mediaType: string
+    mediaType: string,
   ): Promise<WatchlistItem | null> {
     const data = await this.prisma.watchlistItem.findUnique({
       where: {
@@ -59,22 +59,22 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
       data.id,
       data.profileId,
       data.tmdbId,
-      data.mediaType as 'movie' | 'tv',
+      data.mediaType as "movie" | "tv",
       data.title,
-      data.posterPath
+      data.posterPath,
     );
   }
 
   async findByProfileId(
     profileId: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<WatchlistItem[]> {
     const data = await this.prisma.watchlistItem.findMany({
       where: { profileId },
       take: limit,
       skip: offset,
-      orderBy: { addedAt: 'desc' },
+      orderBy: { addedAt: "desc" },
     });
 
     return data.map((item: any) =>
@@ -82,10 +82,10 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
         item.id,
         item.profileId,
         item.tmdbId,
-        item.mediaType as 'movie' | 'tv',
+        item.mediaType as "movie" | "tv",
         item.title,
-        item.posterPath
-      )
+        item.posterPath,
+      ),
     );
   }
 
@@ -95,7 +95,10 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
     });
   }
 
-  async update(id: string, item: Partial<WatchlistItem>): Promise<WatchlistItem> {
+  async update(
+    id: string,
+    item: Partial<WatchlistItem>,
+  ): Promise<WatchlistItem> {
     const updated = await this.prisma.watchlistItem.update({
       where: { id },
       data: {
@@ -108,9 +111,9 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
       updated.id,
       updated.profileId,
       updated.tmdbId,
-      updated.mediaType as 'movie' | 'tv',
+      updated.mediaType as "movie" | "tv",
       updated.title,
-      updated.posterPath
+      updated.posterPath,
     );
   }
 

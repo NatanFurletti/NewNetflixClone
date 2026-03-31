@@ -1,6 +1,6 @@
 // src/interfaces/middlewares/errorHandler.ts
-import { Request, Response, NextFunction } from 'express';
-import { DomainError } from '@/domain/errors/DomainError';
+import { Request, Response, NextFunction } from "express";
+import { DomainError } from "../../domain/errors/DomainError";
 
 /**
  * Middleware para tratar erros
@@ -10,9 +10,9 @@ export function errorHandler(
   error: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void {
-  console.error('Error:', error);
+  console.error("Error:", error);
 
   // Se for DomainError, usar o código para mapear status HTTP
   if (error instanceof DomainError) {
@@ -39,7 +39,7 @@ export function errorHandler(
 
   // Erro genérico
   res.status(500).json({
-    error: 'Internal Server Error',
-    code: 'INTERNAL_ERROR',
+    error: "Internal Server Error",
+    code: "INTERNAL_ERROR",
   });
 }

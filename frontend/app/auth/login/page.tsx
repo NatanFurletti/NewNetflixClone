@@ -1,33 +1,33 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/auth'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const { login } = useAuth()
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      await login(email, password)
-      toast.success('Login successful!')
-      router.push('/dashboard')
+      await login(email, password);
+      toast.success("Login successful!");
+      router.push("/dashboard");
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Login failed'
-      toast.error(message)
+      const message = error?.response?.data?.message || "Login failed";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex items-center justify-center px-4">
@@ -72,14 +72,14 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         {/* Help text */}
         <div className="mt-6 text-center">
           <p className="text-gray-400">
-            No account?{' '}
+            No account?{" "}
             <Link href="/auth/register" className="text-white hover:underline">
               Sign up now
             </Link>
@@ -87,5 +87,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

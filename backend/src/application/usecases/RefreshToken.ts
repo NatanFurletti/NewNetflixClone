@@ -1,6 +1,6 @@
 // src/application/usecases/RefreshToken.ts
 import { TokenService } from "../services/TokenService";
-import { UnauthorizedError } from "@/domain/errors/DomainError";
+import { UnauthorizedError } from "../../domain/errors/DomainError";
 
 /**
  * Use Case: Renovar token de acesso

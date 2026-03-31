@@ -1,8 +1,8 @@
 // src/interfaces/controllers/WatchlistController.ts
 import { Request, Response } from "express";
-import { AddToWatchlistUseCase } from "@/application/usecases/AddToWatchlist";
-import { RemoveFromWatchlistUseCase } from "@/application/usecases/RemoveFromWatchlist";
-import { GetWatchlistItemsUseCase } from "@/application/usecases/GetWatchlistItems";
+import { AddToWatchlistUseCase } from '../../application/usecases/AddToWatchlist';
+import { RemoveFromWatchlistUseCase } from '../../application/usecases/RemoveFromWatchlist';
+import { GetWatchlistItemsUseCase } from '../../application/usecases/GetWatchlistItems';
 
 export class WatchlistController {
   constructor(

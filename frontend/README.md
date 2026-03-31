@@ -5,7 +5,8 @@ Modern React/Next.js 14 frontend for Netflix Clone project.
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -75,6 +76,7 @@ frontend/
 Frontend connects to backend at `http://localhost:3001/api`
 
 ### Key Endpoints:
+
 - `POST /auth/register` - Register user
 - `POST /auth/login` - Login user
 - `GET /profiles` - Get user profiles

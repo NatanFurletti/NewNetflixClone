@@ -1,12 +1,12 @@
 // src/application/usecases/RegisterUser.ts
 import { v4 as uuid } from "uuid";
-import { User } from "@/domain/entities/User";
+import { User } from "../../domain/entities/User";
 import {
   InvalidEmailError,
   DuplicateEmailError,
-} from "@/domain/errors/DomainError";
+} from "../../domain/errors/DomainError";
 import { PasswordService } from "../services/PasswordService";
-import { IUserRepository } from "@/domain/repositories/IUserRepository";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
 
 /**
  * Use Case: Registrar novo usuário

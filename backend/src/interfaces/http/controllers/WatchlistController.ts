@@ -1,11 +1,11 @@
 // src/interfaces/http/controllers/WatchlistController.ts
 import { Request, Response } from 'express';
-import { CreateProfileUseCase } from '@/application/usecases/CreateProfile';
-import { GetProfilesUseCase } from '@/application/usecases/GetProfiles';
-import { AddToWatchlistUseCase } from '@/application/usecases/AddToWatchlist';
-import { RemoveFromWatchlistUseCase } from '@/application/usecases/RemoveFromWatchlist';
-import { GetWatchlistItemsUseCase } from '@/application/usecases/GetWatchlistItems';
-import { GetTrendingMoviesUseCase } from '@/application/usecases/GetTrendingMovies';
+import { CreateProfileUseCase } from '../../../application/usecases/CreateProfile';
+import { GetProfilesUseCase } from '../../../application/usecases/GetProfiles';
+import { AddToWatchlistUseCase } from '../../../application/usecases/AddToWatchlist';
+import { RemoveFromWatchlistUseCase } from '../../../application/usecases/RemoveFromWatchlist';
+import { GetWatchlistItemsUseCase } from '../../../application/usecases/GetWatchlistItems';
+import { GetTrendingMoviesUseCase } from '../../../application/usecases/GetTrendingMovies';
 
 export class WatchlistController {
   constructor(

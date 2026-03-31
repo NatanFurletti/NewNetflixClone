@@ -1,7 +1,7 @@
 // src/application/usecases/CreateProfile.ts
 import { v4 as uuid } from "uuid";
-import { Profile } from "@/domain/entities/Profile";
-import { IProfileRepository } from "@/domain/repositories/IProfileRepository";
+import { Profile } from "../../domain/entities/Profile";
+import { IProfileRepository } from "../../domain/repositories/IProfileRepository";
 
 /**
  * Use Case: Criar novo perfil para usuário

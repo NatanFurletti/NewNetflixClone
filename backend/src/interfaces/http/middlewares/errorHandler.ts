@@ -1,6 +1,6 @@
 // src/interfaces/http/middlewares/errorHandler.ts
 import { Request, Response, NextFunction } from 'express';
-import { DomainError } from '@/domain/errors/DomainError';
+import { DomainError } from '../../../domain/errors/DomainError';
 
 /**
  * Mapeia DomainError para HTTP status codes

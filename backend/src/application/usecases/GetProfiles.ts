@@ -1,5 +1,5 @@
 // src/application/usecases/GetProfiles.ts
-import { IProfileRepository } from "@/domain/repositories/IProfileRepository";
+import { IProfileRepository } from "../../domain/repositories/IProfileRepository";
 
 /**
  * Use Case: Listar perfis de um usuário

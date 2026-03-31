@@ -1,8 +1,8 @@
 // src/interfaces/controllers/AuthController.ts
 import { Request, Response } from 'express';
-import { RegisterUserUseCase } from '@/application/usecases/RegisterUser';
-import { LoginUseCase } from '@/application/usecases/Login';
-import { RefreshTokenUseCase } from '@/application/usecases/RefreshToken';
+import { RegisterUserUseCase } from '../../application/usecases/RegisterUser';
+import { LoginUseCase } from '../../application/usecases/Login';
+import { RefreshTokenUseCase } from '../../application/usecases/RefreshToken';
 
 export class AuthController {
   constructor(

@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { useAuth } from '@/contexts/auth'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React from 'react'
+import { useAuth } from "@/contexts/auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { user, logout } = useAuth()
-  const router = useRouter()
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = () => {
-    logout()
-    router.push('/')
-  }
+    logout();
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900">
@@ -29,10 +29,16 @@ export default function DashboardLayout({
             </Link>
 
             <div className="flex items-center gap-6">
-              <Link href="/trending" className="text-gray-400 hover:text-white transition">
+              <Link
+                href="/trending"
+                className="text-gray-400 hover:text-white transition"
+              >
                 Trending
               </Link>
-              <Link href="/dashboard/profiles" className="text-gray-400 hover:text-white transition">
+              <Link
+                href="/dashboard/profiles"
+                className="text-gray-400 hover:text-white transition"
+              >
                 Profiles
               </Link>
 
@@ -53,5 +59,5 @@ export default function DashboardLayout({
       {/* Main Content */}
       {children}
     </div>
-  )
+  );
 }

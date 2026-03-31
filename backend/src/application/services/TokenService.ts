@@ -1,6 +1,6 @@
 // src/application/services/TokenService.ts
 import * as jwt from "jsonwebtoken";
-import { UnauthorizedError } from "@/domain/errors/DomainError";
+import { UnauthorizedError } from "../../domain/errors/DomainError";
 
 /**
  * TokenService — Serviço para geração e validação de JWT

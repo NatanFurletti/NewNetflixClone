@@ -16,14 +16,14 @@ import {
   RemoveFromWatchlistUseCase,
   GetWatchlistItemsUseCase,
   GetTrendingMoviesUseCase
-} from '@/application';
+} from '../application';
 import { 
   PrismaUserRepository,
   PrismaProfileRepository,
   PrismaWatchlistRepository
-} from '@/infrastructure/repositories';
-import { TmdbClient } from '@/infrastructure/external/TmdbClient';
-import { RedisCache } from '@/infrastructure/services/RedisCache';
+} from '../infrastructure/repositories';
+import { TmdbClient } from '../infrastructure/external/TmdbClient';
+import { RedisCache } from '../infrastructure/services/RedisCache';
 import { AuthController, ProfileController, WatchlistController } from './controllers';
 
 export function createApp(prisma: PrismaClient, jwtAccessSecret: string, jwtRefreshSecret: string): Express {

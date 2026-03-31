@@ -1,5 +1,5 @@
 // src/application/usecases/GetWatchlistItems.ts
-import { IWatchlistRepository } from "@/domain/repositories/IWatchlistRepository";
+import { IWatchlistRepository } from "../../domain/repositories/IWatchlistRepository";
 
 /**
  * Use Case: Listar itens da watchlist

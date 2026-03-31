@@ -1,8 +1,8 @@
 // src/application/usecases/Login.ts
 import { TokenService } from "../services/TokenService";
 import { PasswordService } from "../services/PasswordService";
-import { UnauthorizedError } from "@/domain/errors/DomainError";
-import { IUserRepository } from "@/domain/repositories/IUserRepository";
+import { UnauthorizedError } from "../../domain/errors/DomainError";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
 
 /**
  * Use Case: Fazer login de usuário

@@ -1,5 +1,5 @@
 // src/application/usecases/RemoveFromWatchlist.ts
-import { IWatchlistRepository } from "@/domain/repositories/IWatchlistRepository";
+import { IWatchlistRepository } from "../../domain/repositories/IWatchlistRepository";
 
 /**
  * Use Case: Remover item da watchlist

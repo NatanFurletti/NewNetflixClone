@@ -1,37 +1,38 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import apiClient from '@/lib/api/client'
-import { Movie } from '@/types'
-import toast from 'react-hot-toast'
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import apiClient from "@/lib/api/client";
+import { Movie } from "@/types";
+import toast from "react-hot-toast";
 
 export default function TrendingPage() {
-  const [movies, setMovies] = useState<Movie[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchTrendingMovies()
-  }, [])
+    fetchTrendingMovies();
+  }, []);
 
   const fetchTrendingMovies = async () => {
     try {
-      const response = await apiClient.get<Movie[]>('/trending/movies')
-      setMovies(response.data)
+      const response = await apiClient.get<Movie[]>("/trending/movies");
+      setMovies(response.data);
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Failed to load trending movies'
-      toast.error(message)
+      const message =
+        error?.response?.data?.message || "Failed to load trending movies";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white text-xl">Loading trending movies...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -102,5 +103,5 @@ export default function TrendingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

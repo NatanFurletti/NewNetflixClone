@@ -1,7 +1,7 @@
 // src/interfaces/http/middlewares/auth.ts
 import { Request, Response, NextFunction } from 'express';
-import { TokenService } from '@/application/services/TokenService';
-import { UnauthorizedError } from '@/domain/errors/DomainError';
+import { TokenService } from '../../../application/services/TokenService';
+import { UnauthorizedError } from '../../../domain/errors/DomainError';
 
 declare global {
   namespace Express {
@@ -30,7 +30,7 @@ export function authMiddleware(jwtAccessSecret: string) {
 
       req.userId = decoded.sub;
       next();
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof UnauthorizedError) {
         res.status(401).json({
           error: error.message,

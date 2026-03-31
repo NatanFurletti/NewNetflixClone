@@ -1,45 +1,45 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/auth'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const { register } = useAuth()
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match')
-      return
+      toast.error("Passwords do not match");
+      return;
     }
 
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters')
-      return
+      toast.error("Password must be at least 6 characters");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      await register(email, password)
-      toast.success('Account created! Redirecting to dashboard...')
-      router.push('/dashboard')
+      await register(email, password);
+      toast.success("Account created! Redirecting to dashboard...");
+      router.push("/dashboard");
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Registration failed'
-      toast.error(message)
+      const message = error?.response?.data?.message || "Registration failed";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex items-center justify-center px-4">
@@ -100,14 +100,14 @@ export default function RegisterPage() {
             disabled={isLoading}
             className="w-full py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         {/* Help text */}
         <div className="mt-6 text-center">
           <p className="text-gray-400">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link href="/auth/login" className="text-white hover:underline">
               Sign in
             </Link>
@@ -115,5 +115,5 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

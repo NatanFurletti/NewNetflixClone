@@ -1,7 +1,7 @@
 // src/infrastructure/repositories/PrismaProfileRepository.ts
 import { PrismaClient } from '@prisma/client';
-import { Profile } from '@/domain/entities/Profile';
-import { IProfileRepository } from '@/domain/repositories/IProfileRepository';
+import { Profile } from '../../domain/entities/Profile';
+import { IProfileRepository } from '../../domain/repositories/IProfileRepository';
 
 export class PrismaProfileRepository implements IProfileRepository {
   constructor(private prisma: PrismaClient) {}

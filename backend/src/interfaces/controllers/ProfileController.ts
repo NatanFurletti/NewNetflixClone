@@ -1,7 +1,7 @@
 // src/interfaces/controllers/ProfileController.ts
 import { Request, Response } from 'express';
-import { CreateProfileUseCase } from '@/application/usecases/CreateProfile';
-import { GetProfilesUseCase } from '@/application/usecases/GetProfiles';
+import { CreateProfileUseCase } from '../../application/usecases/CreateProfile';
+import { GetProfilesUseCase } from '../../application/usecases/GetProfiles';
 
 export class ProfileController {
   constructor(

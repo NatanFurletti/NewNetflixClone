@@ -1,7 +1,7 @@
 // src/interfaces/middlewares/authMiddleware.ts
-import { Request, Response, NextFunction } from 'express';
-import { TokenService } from '@/application/services/TokenService';
-import { UnauthorizedError } from '@/domain/errors/DomainError';
+import { Request, Response, NextFunction } from "express";
+import { TokenService } from "../../application/services/TokenService";
+import { UnauthorizedError } from "../../domain/errors/DomainError";
 
 declare global {
   namespace Express {
@@ -19,10 +19,10 @@ export function authMiddleware(jwtAccessSecret: string) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401).json({
-        error: 'Authorization token required',
-        code: 'UNAUTHORIZED',
+        error: "Authorization token required",
+        code: "UNAUTHORIZED",
       });
       return;
     }
@@ -33,16 +33,16 @@ export function authMiddleware(jwtAccessSecret: string) {
       const decoded = TokenService.validateToken(token, jwtAccessSecret);
 
       // Validar que é um access token (não refresh)
-      if (decoded.type !== 'access') {
-        throw new UnauthorizedError('Invalid token type');
+      if (decoded.type !== "access") {
+        throw new UnauthorizedError("Invalid token type");
       }
 
       req.userId = decoded.sub;
       next();
     } catch (error) {
       res.status(401).json({
-        error: 'Invalid or expired token',
-        code: 'UNAUTHORIZED',
+        error: "Invalid or expired token",
+        code: "UNAUTHORIZED",
       });
     }
   };

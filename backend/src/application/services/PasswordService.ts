@@ -1,6 +1,6 @@
 // src/application/services/PasswordService.ts
 import * as bcrypt from "bcryptjs";
-import { WeakPasswordError } from "@/domain/errors/DomainError";
+import { WeakPasswordError } from "../../domain/errors/DomainError";
 
 /**
  * PasswordService — Serviço para hashing e verificação de senhas
