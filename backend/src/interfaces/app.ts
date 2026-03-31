@@ -14,13 +14,16 @@ import {
   GetProfilesUseCase,
   AddToWatchlistUseCase,
   RemoveFromWatchlistUseCase,
-  GetWatchlistItemsUseCase
+  GetWatchlistItemsUseCase,
+  GetTrendingMoviesUseCase
 } from '@/application';
 import { 
   PrismaUserRepository,
   PrismaProfileRepository,
   PrismaWatchlistRepository
 } from '@/infrastructure/repositories';
+import { TmdbClient } from '@/infrastructure/external/TmdbClient';
+import { RedisCache } from '@/infrastructure/services/RedisCache';
 import { AuthController, ProfileController, WatchlistController } from './controllers';
 
 export function createApp(prisma: PrismaClient, jwtAccessSecret: string, jwtRefreshSecret: string): Express {
@@ -56,6 +59,12 @@ export function createApp(prisma: PrismaClient, jwtAccessSecret: string, jwtRefr
   const removeFromWatchlistUseCase = new RemoveFromWatchlistUseCase(watchlistRepository);
   const getWatchlistItemsUseCase = new GetWatchlistItemsUseCase(watchlistRepository);
 
+  // Inicializar serviços externos (TMDB e Cache)
+  const tmdbBearerToken = process.env.TMDB_BEARER_TOKEN || 'test_token';
+  const tmdbClient = new TmdbClient(tmdbBearerToken);
+  const redisCache = new RedisCache();
+  const getTrendingMoviesUseCase = new GetTrendingMoviesUseCase(tmdbClient, redisCache);
+
   // Inicializar controllers
   const authController = new AuthController(
     registerUserUseCase,
@@ -74,6 +83,16 @@ export function createApp(prisma: PrismaClient, jwtAccessSecret: string, jwtRefr
 
   // Rotas públicas
   app.use('/api/auth', createAuthRoutes(authController));
+
+  // Rota de conteúdo em tendência (pública)
+  app.get('/api/trending/movies', async (_req, res, next) => {
+    try {
+      const movies = await getTrendingMoviesUseCase.execute();
+      res.status(200).json(movies);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Rotas privadas (requerem autenticação)
   app.use('/api/profiles', authMiddleware(jwtAccessSecret), createProfileRoutes(profileController));
