@@ -15,13 +15,20 @@ export class AuthController {
     try {
       const { email, password } = req.body;
 
-      const result = await this.registerUserUseCase.execute({
+      // Register user
+      await this.registerUserUseCase.execute({
+        email,
+        password,
+      });
+
+      // Auto-login after registration
+      const loginResult = await this.loginUseCase.execute({
         email,
         password,
       });
 
       res.status(201).json({
-        data: result,
+        data: loginResult,
         message: 'Usuário registrado com sucesso',
       });
     } catch (error) {
@@ -49,10 +56,11 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
-      const { refreshToken } = req.body;
+      const { refresh_token, refreshToken } = req.body;
+      const token = refresh_token || refreshToken; // Accept both formats
 
       const result = await this.refreshTokenUseCase.execute({
-        refreshToken,
+        refreshToken: token,
       });
 
       res.status(200).json({

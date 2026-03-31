@@ -16,7 +16,7 @@ export class RefreshTokenUseCase {
 
   async execute(input: {
     refreshToken: string;
-  }): Promise<{ accessToken: string; refreshToken: string }> {
+  }): Promise<{ access_token: string; refresh_token: string }> {
     // 1. Validar refresh token
     let decoded: any;
     try {
@@ -43,18 +43,18 @@ export class RefreshTokenUseCase {
 
     // 5. Gerar novos tokens
     const userId = decoded.sub;
-    const newAccessToken = TokenService.generateAccessToken(
+    const access_token = TokenService.generateAccessToken(
       userId,
       this.jwtAccessSecret,
     );
-    const newRefreshToken = TokenService.generateRefreshToken(
+    const refresh_token = TokenService.generateRefreshToken(
       userId,
       this.jwtRefreshSecret,
     );
 
     return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      access_token,
+      refresh_token,
     };
   }
 

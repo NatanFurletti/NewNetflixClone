@@ -27,7 +27,7 @@ export class LoginUseCase {
   async execute(input: {
     email: string;
     password: string;
-  }): Promise<{ accessToken: string; refreshToken: string }> {
+  }): Promise<{ access_token: string; refresh_token: string; user: { id: string; email: string } }> {
     // 1. Verificar se conta está bloqueada por brute force
     this.checkBruteForceProtection(input.email);
 
@@ -55,16 +55,23 @@ export class LoginUseCase {
     this.failedAttempts.delete(input.email);
 
     // 6. Gerar tokens
-    const accessToken = TokenService.generateAccessToken(
+    const access_token = TokenService.generateAccessToken(
       user.id,
       this.jwtAccessSecret,
     );
-    const refreshToken = TokenService.generateRefreshToken(
+    const refresh_token = TokenService.generateRefreshToken(
       user.id,
       this.jwtRefreshSecret,
     );
 
-    return { accessToken, refreshToken };
+    return {
+      access_token,
+      refresh_token,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    };
   }
 
   private checkBruteForceProtection(email: string): void {
