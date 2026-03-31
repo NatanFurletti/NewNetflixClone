@@ -22,8 +22,18 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      toast.error("Password must contain at least one uppercase letter");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      toast.error("Password must contain at least one number");
       return;
     }
 
@@ -34,7 +44,7 @@ export default function RegisterPage() {
       toast.success("Account created! Redirecting to dashboard...");
       router.push("/dashboard");
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Registration failed";
+      const message = error?.response?.data?.error || error?.response?.data?.message || "Registration failed";
       toast.error(message);
     } finally {
       setIsLoading(false);

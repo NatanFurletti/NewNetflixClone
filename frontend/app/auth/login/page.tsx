@@ -22,7 +22,7 @@ export default function LoginPage() {
       toast.success("Login successful!");
       router.push("/dashboard");
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Login failed";
+      const message = error?.response?.data?.error || error?.response?.data?.message || "Login failed";
       toast.error(message);
     } finally {
       setIsLoading(false);
