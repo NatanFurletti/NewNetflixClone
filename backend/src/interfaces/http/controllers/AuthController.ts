@@ -1,8 +1,18 @@
 // src/interfaces/http/controllers/AuthController.ts
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { RegisterUserUseCase } from '../../../application/usecases/RegisterUser';
 import { LoginUseCase } from '../../../application/usecases/Login';
 import { RefreshTokenUseCase } from '../../../application/usecases/RefreshToken';
+import { 
+  RegisterSchema, 
+  LoginSchema, 
+  RefreshTokenSchema,
+  RegisterInput,
+  LoginInput,
+  RefreshTokenInput,
+} from '../../../application/validation/schemas';
+import { BadRequestError } from '../../../domain/errors/DomainError';
 
 export class AuthController {
   constructor(
@@ -13,18 +23,19 @@ export class AuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
+      // Validate input
+      const validatedData: RegisterInput = RegisterSchema.parse(req.body);
 
       // Register user
       await this.registerUserUseCase.execute({
-        email,
-        password,
+        email: validatedData.email,
+        password: validatedData.password,
       });
 
       // Auto-login after registration
       const loginResult = await this.loginUseCase.execute({
-        email,
-        password,
+        email: validatedData.email,
+        password: validatedData.password,
       });
 
       res.status(201).json({
@@ -32,17 +43,23 @@ export class AuthController {
         message: 'Usuário registrado com sucesso',
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
 
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
+      // Validate input
+      const validatedData: LoginInput = LoginSchema.parse(req.body);
 
       const result = await this.loginUseCase.execute({
-        email,
-        password,
+        email: validatedData.email,
+        password: validatedData.password,
       });
 
       res.status(200).json({
@@ -50,14 +67,24 @@ export class AuthController {
         message: 'Login realizado com sucesso',
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
 
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
-      const { refresh_token, refreshToken } = req.body;
-      const token = refresh_token || refreshToken; // Accept both formats
+      // Validate input - try refresh_token first, fall back to refreshToken
+      const tokenData = req.body.refresh_token 
+        ? { refresh_token: req.body.refresh_token }
+        : { refresh_token: req.body.refreshToken };
+      
+      const validatedData: RefreshTokenInput = RefreshTokenSchema.parse(tokenData);
+      const token = validatedData.refresh_token;
 
       const result = await this.refreshTokenUseCase.execute({
         refreshToken: token,
@@ -68,6 +95,11 @@ export class AuthController {
         message: 'Token renovado com sucesso',
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }

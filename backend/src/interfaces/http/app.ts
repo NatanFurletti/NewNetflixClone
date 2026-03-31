@@ -19,20 +19,57 @@ export interface AppConfig {
 export function createApp(config: AppConfig): express.Application {
   const app = express();
 
-  // Security middleware
-  app.use(helmet());
-  app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
+  // Security headers
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    },
   }));
 
-  // Rate limiting
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Muitas requisições deste IP, por favor try again later.',
+  // CORS with environment-based whitelist
+  const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3004').split(',').map(o => o.trim());
+  app.use(cors({
+    origin: corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
+  }));
+
+  // General rate limiting
+  const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10); // 15 minutes
+  const maxRequests = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10);
+  
+  const generalLimiter = rateLimit({
+    windowMs,
+    max: maxRequests,
+    message: 'Muitas requisições deste IP, por favor tente novamente mais tarde.',
+    standardHeaders: true,
+    legacyHeaders: false,
   });
-  app.use(limiter);
+  
+  // Stricter limiter for auth endpoints
+  const authLimiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // Same window
+    max: 5, // Much stricter limit for auth
+    message: 'Muitas tentativas de autenticação, por favor tente novamente mais tarde.',
+    skipSuccessfulRequests: true, // Don't count successful requests
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Apply general limiter
+  app.use(generalLimiter);
 
   // Body parsing
   app.use(express.json());
@@ -44,7 +81,7 @@ export function createApp(config: AppConfig): express.Application {
   });
 
   // Routes
-  app.use('/api/auth', createAuthRoutes(config.authController));
+  app.use('/api/auth', createAuthRoutes(config.authController, authLimiter));
   app.use('/api', createWatchlistRoutes(config.watchlistController, config.jwtAccessSecret));
 
   // 404 handler

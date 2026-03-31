@@ -112,3 +112,13 @@ export class DuplicateItemError extends DomainError {
     Object.setPrototypeOf(this, DuplicateItemError.prototype);
   }
 }
+
+/**
+ * Erro: Requisição inválida (problema com validação de input)
+ */
+export class BadRequestError extends DomainError {
+  constructor(message: string = "Requisição inválida") {
+    super(message, "BAD_REQUEST");
+    Object.setPrototypeOf(this, BadRequestError.prototype);
+  }
+}

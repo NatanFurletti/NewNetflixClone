@@ -1,11 +1,23 @@
 // src/interfaces/http/controllers/WatchlistController.ts
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { CreateProfileUseCase } from '../../../application/usecases/CreateProfile';
 import { GetProfilesUseCase } from '../../../application/usecases/GetProfiles';
 import { AddToWatchlistUseCase } from '../../../application/usecases/AddToWatchlist';
 import { RemoveFromWatchlistUseCase } from '../../../application/usecases/RemoveFromWatchlist';
 import { GetWatchlistItemsUseCase } from '../../../application/usecases/GetWatchlistItems';
 import { GetTrendingMoviesUseCase } from '../../../application/usecases/GetTrendingMovies';
+import {
+  CreateProfileSchema,
+  AddToWatchlistSchema,
+  RemoveFromWatchlistSchema,
+  PaginationSchema,
+  CreateProfileInput,
+  AddToWatchlistInput,
+  RemoveFromWatchlistInput,
+  PaginationInput,
+} from '../../../application/validation/schemas';
+import { BadRequestError } from '../../../domain/errors/DomainError';
 
 export class WatchlistController {
   constructor(
@@ -19,14 +31,15 @@ export class WatchlistController {
 
   async createProfile(req: Request, res: Response): Promise<void> {
     try {
-      const { name, avatarUrl, isKids } = req.body;
+      // Validate input
+      const validatedData: CreateProfileInput = CreateProfileSchema.parse(req.body);
       const userId = req.userId!;
 
       const result = await this.createProfileUseCase.execute({
         userId,
-        name,
-        avatarUrl,
-        isKids,
+        name: validatedData.name,
+        avatarUrl: validatedData.avatarUrl || undefined,
+        isKids: validatedData.isKids,
       });
 
       res.status(201).json({
@@ -34,6 +47,11 @@ export class WatchlistController {
         message: 'Perfil criado com sucesso',
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
@@ -54,14 +72,15 @@ export class WatchlistController {
 
   async addToWatchlist(req: Request, res: Response): Promise<void> {
     try {
-      const { profileId, tmdbId, mediaType, title, posterPath } = req.body;
+      // Validate input
+      const validatedData: AddToWatchlistInput = AddToWatchlistSchema.parse(req.body);
 
       const result = await this.addToWatchlistUseCase.execute({
-        profileId,
-        tmdbId,
-        mediaType,
-        title,
-        posterPath,
+        profileId: validatedData.profileId,
+        tmdbId: validatedData.tmdbId,
+        mediaType: validatedData.mediaType,
+        title: validatedData.title,
+        posterPath: validatedData.posterPath,
       });
 
       res.status(201).json({
@@ -69,20 +88,33 @@ export class WatchlistController {
         message: 'Item adicionado à watchlist',
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
 
   async removeFromWatchlist(req: Request, res: Response): Promise<void> {
     try {
-      const { watchlistItemId } = req.params;
+      // Validate input
+      const validatedData: RemoveFromWatchlistInput = RemoveFromWatchlistSchema.parse({
+        watchlistItemId: req.params.watchlistItemId,
+      });
 
       await this.removeFromWatchlistUseCase.execute({
-        watchlistItemId,
+        watchlistItemId: validatedData.watchlistItemId,
       });
 
       res.status(204).send();
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
@@ -90,19 +122,28 @@ export class WatchlistController {
   async getWatchlistItems(req: Request, res: Response): Promise<void> {
     try {
       const { profileId } = req.params;
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      // Validate pagination
+      const validatedPagination: PaginationInput = PaginationSchema.parse({
+        limit: req.query.limit,
+        offset: req.query.offset,
+      });
 
       const result = await this.getWatchlistItemsUseCase.execute({
         profileId,
-        limit,
-        offset,
+        limit: validatedPagination.limit,
+        offset: validatedPagination.offset,
       });
 
       res.status(200).json({
         data: result,
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestError(
+          error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        );
+      }
       throw error;
     }
   }
