@@ -15,6 +15,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Custom event for logout
+export const logoutEvent = new Event("auth-logout");
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +33,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     setIsLoading(false);
+  }, []);
+
+  // Listen for logout events from API client or other sources
+  useEffect(() => {
+    const handleLogout = () => {
+      setUser(null);
+    };
+
+    window.addEventListener("auth-logout", handleLogout);
+    return () => window.removeEventListener("auth-logout", handleLogout);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -77,6 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
     setUser(null);
+    // Dispatch event for other listeners
+    window.dispatchEvent(new Event("auth-logout"));
   };
 
   return (

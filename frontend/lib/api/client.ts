@@ -9,6 +9,21 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
+// Function to perform logout
+const performLogout = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    // Dispatch custom event to notify auth context
+    window.dispatchEvent(new Event("auth-logout"));
+    // Redirect to login after a short delay
+    setTimeout(() => {
+      window.location.href = "/auth/login";
+    }, 300);
+  }
+};
+
 // Add token to requests
 apiClient.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
@@ -42,12 +57,11 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         } catch (refreshError) {
           // Refresh failed - logout user
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          window.location.href = "/auth/login";
+          performLogout();
         }
       } else {
-        window.location.href = "/auth/login";
+        // No refresh token - logout
+        performLogout();
       }
     }
 
