@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       });
 
-      const { access_token, refresh_token, user: userData } = response.data;
+      const { access_token, refresh_token, user: userData } = response.data.data;
 
       // Validate tokens exist
       if (!access_token || !refresh_token) {
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       });
 
-      const { access_token, refresh_token, user: userData } = response.data;
+      const { access_token, refresh_token, user: userData } = response.data.data;
 
       // Validate tokens exist
       if (!access_token || !refresh_token) {
@@ -123,7 +123,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (refreshToken) {
+      try {
+        await apiClient.post("/auth/logout", { refresh_token: refreshToken });
+      } catch {
+        // Ignore errors — clear local state regardless
+      }
+    }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");

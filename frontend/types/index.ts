@@ -10,9 +10,12 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
-  user: User;
+  data: {
+    access_token: string;
+    refresh_token: string;
+    user: User;
+  };
+  message: string;
 }
 
 export interface User {
@@ -47,6 +50,8 @@ export interface WatchlistItem {
   mediaType: "movie" | "tv";
   tmdbId: number;
   profileId: string;
+  title: string;
+  posterPath: string | null;
   createdAt: string;
 }
 
@@ -54,6 +59,8 @@ export interface AddToWatchlistRequest {
   mediaType: "movie" | "tv";
   tmdbId: number;
   profileId: string;
+  title: string;
+  posterPath?: string | null;
 }
 
 // Movie Types from TMDB
