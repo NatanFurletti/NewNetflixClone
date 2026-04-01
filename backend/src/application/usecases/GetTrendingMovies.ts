@@ -1,11 +1,5 @@
 // src/application/usecases/GetTrendingMovies.ts
-/**
- * Interface para cache
- */
-export interface ICacheService {
-  get(key: string): Promise<any>;
-  set(key: string, value: any, ttlSeconds: number): Promise<void>;
-}
+import { ICacheService } from '../../infrastructure/cache/RedisCache';
 
 /**
  * Interface para cliente TMDB
@@ -29,10 +23,10 @@ export class GetTrendingMoviesUseCase {
   ) {}
 
   async execute(): Promise<any[]> {
-    // 1. Verificar cache
-    const cached = await this.cacheService.get(this.CACHE_KEY);
-    if (cached && !cached.stale) {
-      return cached.data;
+    // 1. Verificar cache — o cache armazena o array diretamente
+    const cached = await this.cacheService.get<any[]>(this.CACHE_KEY);
+    if (cached) {
+      return cached;
     }
 
     // 2. Tentar buscar da TMDB com timeout
@@ -51,12 +45,7 @@ export class GetTrendingMoviesUseCase {
 
       return movies as any[];
     } catch (error) {
-      // 4. Se erro e tem cache stale: retornar cache
-      if (cached) {
-        return cached.data;
-      }
-
-      // 5. Se tudo falhar: lançar erro
+      // 4. Se tudo falhar: lançar erro (cache já foi checado acima e estava vazio)
       throw new Error("Não foi possível buscar filmes em tendência");
     }
   }

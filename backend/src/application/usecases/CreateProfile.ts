@@ -2,6 +2,7 @@
 import { v4 as uuid } from "uuid";
 import { Profile } from "../../domain/entities/Profile";
 import { IProfileRepository } from "../../domain/repositories/IProfileRepository";
+import { BadRequestError } from "../../domain/errors/DomainError";
 
 /**
  * Use Case: Criar novo perfil para usuário
@@ -23,7 +24,7 @@ export class CreateProfileUseCase {
     );
 
     if (existingProfiles.length >= this.MAX_PROFILES_PER_USER) {
-      throw new Error("Limite de perfis atingido (máximo 5)");
+      throw new BadRequestError("Limite de perfis atingido (máximo 5)");
     }
 
     // 2. Criar profile (validação de nome feita no construtor)
