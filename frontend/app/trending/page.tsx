@@ -16,7 +16,7 @@ export default function TrendingPage() {
 
   const fetchTrendingMovies = async () => {
     try {
-      const response = await apiClient.get<Movie[]>("/trending/movies");
+      const response = await apiClient.get<Movie[]>("/trending");
       setMovies(response.data);
     } catch (error: any) {
       const message =
