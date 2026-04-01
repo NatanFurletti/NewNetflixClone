@@ -42,6 +42,23 @@ export class RedisCache implements ICacheService {
  */
 export class InMemoryCache implements ICacheService {
   private cache: Map<string, { value: any; expiresAt: number }> = new Map();
+  private readonly sweepInterval: ReturnType<typeof setInterval>;
+
+  constructor(sweepIntervalMs = 60_000) {
+    // Periodically evict expired entries to prevent unbounded memory growth
+    this.sweepInterval = setInterval(() => {
+      const now = Date.now();
+      for (const [key, entry] of this.cache) {
+        if (entry.expiresAt < now) {
+          this.cache.delete(key);
+        }
+      }
+    }, sweepIntervalMs);
+    // Allow the process to exit even if this timer is still running
+    if (this.sweepInterval.unref) {
+      this.sweepInterval.unref();
+    }
+  }
 
   async get<T>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
