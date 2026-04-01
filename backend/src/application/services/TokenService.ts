@@ -1,5 +1,12 @@
 // src/application/services/TokenService.ts
 import * as jwt from "jsonwebtoken";
+
+export interface JwtPayload {
+  sub: string;
+  type: "access" | "refresh";
+  iat: number;
+  exp: number;
+}
 import { UnauthorizedError } from "../../domain/errors/DomainError";
 
 /**
@@ -30,9 +37,9 @@ export class TokenService {
   /**
    * Valida token e retorna payload
    */
-  static validateToken(token: string, secret: string): any {
+  static validateToken(token: string, secret: string): JwtPayload {
     try {
-      return jwt.verify(token, secret);
+      return jwt.verify(token, secret) as JwtPayload;
     } catch (error) {
       throw new UnauthorizedError("Token inválido ou expirado");
     }

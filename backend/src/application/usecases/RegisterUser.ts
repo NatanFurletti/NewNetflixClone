@@ -23,16 +23,13 @@ export class RegisterUserUseCase {
       throw new InvalidEmailError(input.email);
     }
 
-    // 2. Validar força de senha
-    PasswordService.validateStrength(input.password);
-
-    // 3. Verificar se email já existe
+    // 2. Verificar se email já existe
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
       throw new DuplicateEmailError(input.email);
     }
 
-    // 4. Hash password
+    // 3. Hash password (PasswordService.hash já valida a força internamente)
     const passwordHash = await PasswordService.hash(input.password);
 
     // 5. Criar user
