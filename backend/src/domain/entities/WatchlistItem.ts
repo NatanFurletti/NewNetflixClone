@@ -1,5 +1,5 @@
 // src/domain/entities/WatchlistItem.ts
-import { InvalidMediaTypeError } from "../errors/DomainError";
+import { InvalidMediaTypeError, BadRequestError } from "../errors/DomainError";
 
 /**
  * WatchlistItem Entity — Item na watchlist do usuário
@@ -29,7 +29,7 @@ export class WatchlistItem {
 
     // Validação: tmdbId deve ser positivo
     if (tmdbId <= 0) {
-      throw new Error("tmdbId deve ser positivo");
+      throw new BadRequestError("tmdbId deve ser positivo");
     }
 
     this.id = id;

@@ -122,3 +122,13 @@ export class BadRequestError extends DomainError {
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 }
+
+/**
+ * Erro: Recurso não encontrado
+ */
+export class NotFoundError extends DomainError {
+  constructor(message: string = "Recurso não encontrado") {
+    super(message, "NOT_FOUND");
+    Object.setPrototypeOf(this, NotFoundError.prototype);
+  }
+}

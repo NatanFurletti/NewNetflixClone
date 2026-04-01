@@ -1,4 +1,6 @@
 // src/domain/entities/Profile.ts
+import { BadRequestError } from "../errors/DomainError";
+
 /**
  * Profile Entity — Perfil de usuário dentro de uma conta
  * Permite múltiplos perfis por usuário
@@ -21,7 +23,7 @@ export class Profile {
   ) {
     // Validação: nome deve ter 3-20 caracteres
     if (name.length < 3 || name.length > 20) {
-      throw new Error("Nome do perfil deve ter entre 3 e 20 caracteres");
+      throw new BadRequestError("Nome do perfil deve ter entre 3 e 20 caracteres");
     }
 
     this.id = id;
