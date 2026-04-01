@@ -29,15 +29,15 @@ export const RefreshTokenSchema = z.object({
 // Profile Schemas
 export const CreateProfileSchema = z.object({
   name: z.string()
-    .min(1, 'Nome obrigatório')
-    .max(50, 'Nome muitolongo (máximo 50 caracteres)'),
+    .min(3, 'Nome deve ter mínimo 3 caracteres')
+    .max(20, 'Nome muito longo (máximo 20 caracteres)'),
   avatarUrl: z.string().url().optional().nullable(),
   isKids: z.boolean().optional().default(false),
 });
 
-// Watchlist Schemas
+// Watchlist Schemas — IDs usam CUID (gerado pelo Prisma), não UUID
 export const AddToWatchlistSchema = z.object({
-  profileId: z.string().uuid('Profile ID inválido'),
+  profileId: z.string().cuid('Profile ID inválido'),
   tmdbId: z.number().int().positive('Filme/série ID inválido'),
   mediaType: z.enum(['movie', 'tv']),
   title: z.string().min(1).max(255),
@@ -45,7 +45,7 @@ export const AddToWatchlistSchema = z.object({
 });
 
 export const RemoveFromWatchlistSchema = z.object({
-  watchlistItemId: z.string().uuid('Item ID inválido'),
+  watchlistItemId: z.string().cuid('Item ID inválido'),
 });
 
 // Query Schemas
