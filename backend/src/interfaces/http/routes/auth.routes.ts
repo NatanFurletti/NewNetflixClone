@@ -14,6 +14,7 @@ export function createAuthRoutes(authController: AuthController, authLimiter?: R
   router.post('/register', asyncHandler((req, res) => authController.register(req, res)));
   router.post('/login', asyncHandler((req, res) => authController.login(req, res)));
   router.post('/refresh', asyncHandler((req, res) => authController.refreshToken(req, res)));
+  router.post('/logout', asyncHandler((req, res) => authController.logout(req, res)));
 
   return router;
 }

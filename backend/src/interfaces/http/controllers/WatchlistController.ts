@@ -74,8 +74,10 @@ export class WatchlistController {
     try {
       // Validate input
       const validatedData: AddToWatchlistInput = AddToWatchlistSchema.parse(req.body);
+      const userId = req.userId!;
 
       const result = await this.addToWatchlistUseCase.execute({
+        userId,
         profileId: validatedData.profileId,
         tmdbId: validatedData.tmdbId,
         mediaType: validatedData.mediaType,
@@ -103,8 +105,10 @@ export class WatchlistController {
       const validatedData: RemoveFromWatchlistInput = RemoveFromWatchlistSchema.parse({
         watchlistItemId: req.params.watchlistItemId,
       });
+      const userId = req.userId!;
 
       await this.removeFromWatchlistUseCase.execute({
+        userId,
         watchlistItemId: validatedData.watchlistItemId,
       });
 
@@ -122,7 +126,8 @@ export class WatchlistController {
   async getWatchlistItems(req: Request, res: Response): Promise<void> {
     try {
       const { profileId } = req.params;
-      
+      const userId = req.userId!;
+
       // Validate pagination
       const validatedPagination: PaginationInput = PaginationSchema.parse({
         limit: req.query.limit,
@@ -130,6 +135,7 @@ export class WatchlistController {
       });
 
       const result = await this.getWatchlistItemsUseCase.execute({
+        userId,
         profileId,
         limit: validatedPagination.limit,
         offset: validatedPagination.offset,

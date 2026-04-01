@@ -8,8 +8,10 @@ import { DomainError } from '../../../domain/errors/DomainError';
 const errorStatusMap: Record<string, number> = {
   INVALID_EMAIL: 400,
   WEAK_PASSWORD: 400,
+  BAD_REQUEST: 400,
   USER_NOT_FOUND: 404,
   PROFILE_NOT_FOUND: 404,
+  NOT_FOUND: 404,
   DUPLICATE_EMAIL: 409,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -23,7 +25,11 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  console.error('Error:', err);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('Error:', err);
+  } else {
+    console.error('Error:', err.message);
+  }
 
   // Handle DomainError
   if (err instanceof DomainError) {
