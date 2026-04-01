@@ -24,15 +24,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check if user is already authenticated
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      // Restore user from token (in real app, verify token validity)
-      const userData = localStorage.getItem("user");
-      if (userData) {
-        setUser(JSON.parse(userData));
+    try {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        // Restore user from token (in real app, verify token validity)
+        const userData = localStorage.getItem("user");
+        if (userData) {
+          try {
+            setUser(JSON.parse(userData));
+          } catch (parseError) {
+            console.error("Error parsing user data:", parseError);
+            localStorage.removeItem("user");
+          }
+        }
       }
+    } catch (error) {
+      console.error("Error checking auth state:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   // Listen for logout events from API client or other sources
@@ -55,11 +65,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { access_token, refresh_token, user: userData } = response.data;
 
+      // Validate tokens exist
+      if (!access_token || !refresh_token) {
+        throw new Error("Token não recebido da API");
+      }
+
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      setUser(userData);
+      
+      // Only store user if it exists
+      if (userData) {
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+      } else {
+        localStorage.removeItem("user");
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -75,11 +99,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { access_token, refresh_token, user: userData } = response.data;
 
+      // Validate tokens exist
+      if (!access_token || !refresh_token) {
+        throw new Error("Token não recebido da API");
+      }
+
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      setUser(userData);
+      
+      // Only store user if it exists
+      if (userData) {
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+      } else {
+        localStorage.removeItem("user");
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Register error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
