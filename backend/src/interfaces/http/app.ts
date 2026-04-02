@@ -8,11 +8,14 @@ import { WatchlistController } from './controllers/WatchlistController';
 import { createAuthRoutes } from './routes/auth.routes';
 import { createWatchlistRoutes } from './routes/watchlist.routes';
 import { errorHandler } from './middlewares/errorHandler';
+import { ICacheService } from '../../infrastructure/cache/RedisCache';
+import { CacheRateLimitStore } from './utils/RateLimitStore';
 
 export interface AppConfig {
   authController: AuthController;
   watchlistController: WatchlistController;
   jwtAccessSecret: string;
+  cacheService: ICacheService;
   port: number;
 }
 
@@ -24,7 +27,7 @@ export function createApp(config: AppConfig): express.Application {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:'],
       },
@@ -56,16 +59,19 @@ export function createApp(config: AppConfig): express.Application {
     message: 'Muitas requisições deste IP, por favor tente novamente mais tarde.',
     standardHeaders: true,
     legacyHeaders: false,
+    store: new CacheRateLimitStore(config.cacheService),
   });
-  
+
   // Stricter limiter for auth endpoints
+  const authWindowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10);
   const authLimiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // Same window
-    max: 5, // Much stricter limit for auth
+    windowMs: authWindowMs,
+    max: 5,
     message: 'Muitas tentativas de autenticação, por favor tente novamente mais tarde.',
-    skipSuccessfulRequests: true, // Don't count successful requests
+    skipSuccessfulRequests: true,
     standardHeaders: true,
     legacyHeaders: false,
+    store: new CacheRateLimitStore(config.cacheService),
   });
 
   // Apply general limiter
